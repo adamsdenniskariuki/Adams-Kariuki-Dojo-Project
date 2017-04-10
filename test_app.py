@@ -19,7 +19,11 @@ class TestApp(unittest.TestCase):
 
 	#test instance of office
 	def test_create_office_instance(self):
-		self.assertTrue(self.office_instance, Office) 
+		self.assertTrue(self.office_instance, Office)
+
+	#test office mac occupants
+	def test_office_max_occupants(self):
+		self.assertTrue(self.office_instance.max_occupants, 6) 
 
 	#test living space is created
 	def test_create_livingspace_successfully(self):
@@ -32,6 +36,10 @@ class TestApp(unittest.TestCase):
 	#test instance of living space
 	def test_create_livingspace_instance(self):
 		self.assertTrue(self.livingspace_instance, LivingSpace)
+
+	#test office mac occupants
+	def test_livingspace_max_occupants(self):
+		self.assertTrue(self.livingspace_instance.max_occupants, 4)
 
 	#test fellow is created
 	def test_add_fellow_successfully(self):
