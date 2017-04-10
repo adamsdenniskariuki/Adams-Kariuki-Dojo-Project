@@ -41,6 +41,7 @@ class Office(Room):
 	
 	def __init__(self):
 		self.max_occupants = 4
+		self.all_rooms = {}
 
 	def create_room(self, room_name, room_type):
 		super(Office, self).__init__(room_name, room_type)
@@ -59,6 +60,7 @@ class LivingSpace(Room):
 	
 	def __init__(self):
 		self.max_occupants = 6
+		self.all_rooms = {}
 
 	def create_room(self, room_name, room_type):
 		super(LivingSpace, self).__init__(room_name, room_type)
@@ -74,15 +76,46 @@ class LivingSpace(Room):
 
 
 class Person(object):
-	pass
+
+	def __init__(self, person_name = [], person_type = ""):
+		self.person_name = person_name
+		self.person_type = person_type
+		self.all_persons = []
+
+	def add_person(self, person_name, person_type):
+		self.person_name = person_name
+		self.person_type = person_type
+		return
 
 
 class Staff(Person):
-	pass
+	
+	def __init__(self):
+		self.all_persons = []
+
+	def add_person(self, person_name, person_type, wants_accommodation = 'N'):
+		super(Staff, self).__init__(person_name, person_type, )
+		self.wants_accommodation = wants_accommodation
+		if(self.wants_accommodation == 'Y'):
+			return "Staff are not allocated living quarters."
+		else:
+			self.all_persons = [self.person_name, self.person_type]
+			return self.all_persons
 
 
 class Fellow(Person):
-	pass
+	
+	def __init__(self):
+		self.all_persons = []
+
+	def add_person(self, person_name, person_type, wants_accommodation = 'N'):
+		super(Fellow, self).__init__(person_name, person_type)
+		self.wants_accommodation = wants_accommodation
+		if(not self.wants_accommodation):
+			self.all_persons = [self.person_name, self.person_type, 'N']
+		else:
+			self.all_persons = [self.person_name, self.person_type, self.wants_accommodation]
+		return self.all_persons
 
 
 from docopt import docopt, DocoptExit
@@ -100,7 +133,7 @@ if __name__ == '__main__':
 		pass
 
 	else:
-		if arguments['create_room'] == True and arguments['<room_type>'] == "Office":
+		if arguments['create_room'] and arguments['<room_type>'] == "Office":
 			room_instance = Office()
 			room_result = room_instance.create_room(
 				arguments['<room_name>'], arguments['<room_type>'])
@@ -111,7 +144,7 @@ if __name__ == '__main__':
 			else:
 				print(room_result)
 		
-		elif arguments['create_room'] == True and arguments['<room_type>'] == "Livingspace":
+		elif arguments['create_room'] and arguments['<room_type>'] == "Livingspace":
 			room_instance = LivingSpace()
 			room_result = room_instance.create_room(
 				arguments['<room_name>'], arguments['<room_type>'])
@@ -121,3 +154,26 @@ if __name__ == '__main__':
 						room))
 			else:
 				print(room_result)
+
+		elif arguments['add_person'] and arguments['Fellow']:
+			person_instance = Fellow()
+			person_result = person_instance.add_person(" ".join(arguments['<person_name>']),
+				'Fellow', arguments['<wants_accommodation>'])
+			if (isinstance(person_result, str)):
+				print(person_result)
+			else:
+				for person in person_result:
+					print(person)
+			
+
+		elif arguments['add_person'] and arguments['Staff']:
+			person_instance = Staff()
+			person_result = person_instance.add_person(" ".join(arguments['<person_name>']),
+				'Staff', arguments['<wants_accommodation>'])
+			if (isinstance(person_result, str)):
+				print(person_result)
+			else:
+				for person in person_result:
+					print(person)
+
+
