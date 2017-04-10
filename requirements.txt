@@ -1,0 +1,4 @@
+docopt==0.6.2
+pytest==3.0.7
+virtualenv==15.1.0
+
