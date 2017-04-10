@@ -2,6 +2,7 @@
 Dojo.
 
 Usage:
+	app.py
 	app.py create_room <room_type> <room_name>...
 	app.py add_person (<person_name> <person_name>) (Fellow|Staff) [<wants_accommodation>]
 	app.py (-h | --help)
@@ -24,9 +25,10 @@ class Dojo(object):
 		pass
 
 
+#class to create a room
 class Room(Dojo):
 	
-	def __init__(self, room_name = [], room_type = ""):
+	def __init__(self, room_name, room_type):
 		self.created_rooms = {}
 		self.room_name = room_name
 		self.room_type = room_type
@@ -44,6 +46,7 @@ class Room(Dojo):
 			return self.created_rooms
 
 
+#class to create an office
 class Office(Room):
 	
 	def __init__(self):
@@ -56,6 +59,7 @@ class Office(Room):
 		return	self.all_rooms
 
 
+#class to create a living space
 class LivingSpace(Room):
 	
 	def __init__(self):
@@ -68,48 +72,59 @@ class LivingSpace(Room):
 		return self.all_rooms
 
 
+#class to create a person
 class Person(object):
 
-	def __init__(self, person_name = [], person_type = ""):
+	def __init__(self, person_name, person_type, wants_accommodation = 'N'):
 		self.person_name = person_name
 		self.person_type = person_type
-		self.all_persons = []
+		self.wants_accommodation = wants_accommodation
+		self.person_created = []
 
-	def add_person(self, person_name, person_type, wants_accommodation = 'N'):
+	def add_person(self, person_name, person_type, wants_accommodation):
 		self.person_name = person_name
 		self.person_type = person_type
-		return
+		self.wants_accommodation = wants_accommodation
+		
+		if(self.wants_accommodation and self.wants_accommodation == "Y" 
+			and self.person_type == "Staff"):
+			return "Staff are not allocated living quarters."
+		elif(not self.wants_accommodation and self.person_type == "Staff" 
+			or self.wants_accommodation == "N"):
+			self.person_created = [self.person_name, self.person_type]
+		elif(not self.wants_accommodation and self.person_type == "Fellow"):
+			self.person_created = [self.person_name, self.person_type, 'N']
+		elif(self.wants_accommodation and self.person_type == "Fellow"):
+			self.person_created = [self.person_name, self.person_type, self.wants_accommodation]
+		
+		return self.person_created
 
 
+#class to create staff
 class Staff(Person):
 	
 	def __init__(self):
-		self.all_persons = []
+		self.created_staff = []
 
 	def add_person(self, person_name, person_type, wants_accommodation = 'N'):
-		super(Staff, self).__init__(person_name, person_type, )
-		self.wants_accommodation = wants_accommodation
-		if(self.wants_accommodation == 'Y'):
-			return "Staff are not allocated living quarters."
-		else:
-			self.all_persons = [self.person_name, self.person_type]
-			return self.all_persons
+		super(Staff, self).__init__(person_name, person_type, wants_accommodation)
+		self.created_staff = super(Staff, self).add_person(self.person_name, 
+			self.person_type, self.wants_accommodation)
+		return self.created_staff
+		
 
-
+#class to create a fellow
 class Fellow(Person):
 	
 	def __init__(self):
-		self.all_persons = []
+		self.created_fellow = []
 
 	def add_person(self, person_name, person_type, wants_accommodation = 'N'):
-		super(Fellow, self).__init__(person_name, person_type)
-		self.wants_accommodation = wants_accommodation
-		if(not self.wants_accommodation):
-			self.all_persons = [self.person_name, self.person_type, 'N']
-		else:
-			self.all_persons = [self.person_name, self.person_type, self.wants_accommodation]
-		return self.all_persons
-
+		super(Fellow, self).__init__(person_name, person_type, wants_accommodation)
+		self.created_fellow = super(Fellow, self).add_person(self.person_name, 
+			self.person_type, self.wants_accommodation)
+		return self.created_fellow
+		
 
 from docopt import docopt, DocoptExit
 from pprint import pprint
@@ -155,8 +170,7 @@ if __name__ == '__main__':
 			if (isinstance(person_result, str)):
 				print(person_result)
 			else:
-				for person in person_result:
-					print(person)
+				print(person_result[1],person_result[0],"has been successfully added,")
 			
 
 		elif arguments['add_person'] and arguments['Staff']:
@@ -166,7 +180,6 @@ if __name__ == '__main__':
 			if (isinstance(person_result, str)):
 				print(person_result)
 			else:
-				for person in person_result:
-					print(person)
+				print(person_result[1],person_result[0],"has been successfully added,")
 
 
