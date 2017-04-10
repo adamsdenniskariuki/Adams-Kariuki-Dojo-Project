@@ -27,14 +27,21 @@ class Dojo(object):
 class Room(Dojo):
 	
 	def __init__(self, room_name = [], room_type = ""):
-		self.all_rooms = {}
+		self.created_rooms = {}
 		self.room_name = room_name
 		self.room_type = room_type
 
 	def create_room(self, room_name, room_type):
 		self.room_name = room_name
 		self.room_type = room_type
-		return
+		
+		if(isinstance(self.room_name, list) == True):
+			for name in self.room_name:
+				self.created_rooms[name] = self.room_type
+			return self.created_rooms
+		else:
+			self.created_rooms[self.room_name] = self.room_type
+			return self.created_rooms
 
 
 class Office(Room):
@@ -45,15 +52,8 @@ class Office(Room):
 
 	def create_room(self, room_name, room_type):
 		super(Office, self).__init__(room_name, room_type)
-		if(isinstance(self.room_name, list) == True):
-			for name in self.room_name:
-				self.all_rooms[name] = self.room_type
-			return self.all_rooms
-		else:
-			self.all_rooms[self.room_name] = self.room_type
-		
-		return "An Office called {} has been successfully created!".format(
-			self.room_name)
+		self.all_rooms = super(Office, self).create_room(self.room_name, self.room_type)
+		return	self.all_rooms
 
 
 class LivingSpace(Room):
@@ -64,15 +64,8 @@ class LivingSpace(Room):
 
 	def create_room(self, room_name, room_type):
 		super(LivingSpace, self).__init__(room_name, room_type)
-		if(isinstance(self.room_name, list) == True):
-			for name in self.room_name:
-				self.all_rooms[name] = self.room_type
-			return self.all_rooms
-		else:
-			self.all_rooms[self.room_name] = self.room_type
-		
-		return "A Living Space called {} has been successfully created!".format(
-			self.room_name)
+		self.all_rooms = super(LivingSpace, self).create_room(self.room_name, self.room_type)
+		return self.all_rooms
 
 
 class Person(object):
@@ -82,7 +75,7 @@ class Person(object):
 		self.person_type = person_type
 		self.all_persons = []
 
-	def add_person(self, person_name, person_type):
+	def add_person(self, person_name, person_type, wants_accommodation = 'N'):
 		self.person_name = person_name
 		self.person_type = person_type
 		return
