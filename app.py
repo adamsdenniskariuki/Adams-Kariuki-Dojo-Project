@@ -34,8 +34,6 @@ class Room(Dojo):
 		self.room_type = room_type
 
 	def create_room(self, room_name, room_type):
-		self.room_name = room_name
-		self.room_type = room_type
 		
 		if(isinstance(self.room_name, list) == True):
 			for name in self.room_name:
@@ -82,9 +80,6 @@ class Person(object):
 		self.person_created = []
 
 	def add_person(self, person_name, person_type, wants_accommodation):
-		self.person_name = person_name
-		self.person_type = person_type
-		self.wants_accommodation = wants_accommodation
 		
 		if(self.wants_accommodation and self.wants_accommodation == "Y" 
 			and self.person_type == "Staff"):
