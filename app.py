@@ -2,11 +2,10 @@
 Dojo.
 
 Usage:
-	app.py
-	app.py create_room <room_type> <room_name>...
-	app.py add_person (<person_name> <person_name>) (Fellow|Staff) [<wants_accommodation>]
-	app.py (-h | --help)
-	app.py (-i | --interactive)
+	create_room <room_type> <room_name>...
+	add_person (<person_name> <person_name>) (Fellow|Staff) [<wants_accommodation>]
+	(-h | --help)
+	(-i | --interactive)
 
 Arguments:
 	<room_type> Office or Living Space
@@ -45,12 +44,12 @@ class Office(Room):
 	
 	def __init__(self):
 		self.max_occupants = 4
-		self.all_rooms = {}
+		self.offices = {}
 
 	def create_room(self, room_name, room_type):
 		super(Office, self).__init__(room_name, room_type)
-		self.all_rooms = super(Office, self).create_room(self.room_name, self.room_type)
-		return	self.all_rooms
+		self.offices = super(Office, self).create_room(self.room_name, self.room_type)
+		return	self.offices
 
 
 #class to create a living space
@@ -58,12 +57,12 @@ class LivingSpace(Room):
 	
 	def __init__(self):
 		self.max_occupants = 6
-		self.all_rooms = {}
+		self.living_spaces = {}
 
 	def create_room(self, room_name, room_type):
 		super(LivingSpace, self).__init__(room_name, room_type)
-		self.all_rooms = super(LivingSpace, self).create_room(self.room_name, self.room_type)
-		return self.all_rooms
+		self.living_spaces = super(LivingSpace, self).create_room(self.room_name, self.room_type)
+		return self.living_spaces
 
 
 #class to create a person
@@ -82,7 +81,7 @@ class Person(object):
 			return "Staff are not allocated living quarters."
 		elif(not self.wants_accommodation and self.person_type == "Staff" 
 			or self.wants_accommodation == "N"):
-			self.person_created = [self.person_name, self.person_type]
+			self.person_created = [self.person_name, self.person_type, 'N']
 		elif(not self.wants_accommodation and self.person_type == "Fellow"):
 			self.person_created = [self.person_name, self.person_type, 'N']
 		elif(self.wants_accommodation and self.person_type == "Fellow"):
@@ -93,7 +92,7 @@ class Person(object):
 
 #class to create staff
 class Staff(Person):
-	
+
 	def __init__(self):
 		self.created_staff = []
 
@@ -117,9 +116,8 @@ class Fellow(Person):
 		return self.created_fellow
 		
 import cmd
-import sys
+import random
 from docopt import docopt, DocoptExit
-from pprint import pprint
 
 
 #class to make the app interactive
@@ -127,6 +125,21 @@ class Dojo (cmd.Cmd):
     intro   = '\nWelcome to the dojo program!\n\nType help for assistance and exit to leave.\n'
     prompt  = 'Dojo >>>'
     file    = None
+    created_rooms = {}
+    created_persons = {}
+    room_allocation = {}
+
+    def allocate_room(self, person_name):
+    	if(len(self.created_rooms) > 0):
+    		rooms_list = []
+    		for key, value in self.created_rooms.items():
+    			rooms_list.append(key)
+
+    		random_key = random.randint(0 , len(rooms_list) - 1)
+    		room_allocated = rooms_list[random_key]
+    		self.room_allocation.update({person_name:[room_allocated, self.created_rooms[room_allocated]]})
+
+    		return 1
 
     def do_create_room(self, arg):
 
@@ -147,26 +160,28 @@ class Dojo (cmd.Cmd):
 
         else:
         	if arguments['<room_type>'] == "Office":
-        		room_instance = Office()
-        		room_result = room_instance.create_room(
+        		office_instance = Office()
+        		office_result = office_instance.create_room(
 					arguments['<room_name>'], arguments['<room_type>'])
-        		if(isinstance(room_result, dict)):
-        			for room in room_result:
+        		if(isinstance(office_result, dict)):
+        			self.created_rooms.update(office_result)
+        			for office in office_result:
         				print("An Office called {} has been successfully created!".format(
-							room))
+							office))
         		else:
-        			print(room_result)
+        			print(office_result)
 
         	elif arguments['<room_type>'] == "Livingspace":
-        		room_instance = LivingSpace()
-        		room_result = room_instance.create_room(
+        		livingspace_instance = LivingSpace()
+        		livingspace_result = livingspace_instance.create_room(
         			arguments['<room_name>'], arguments['<room_type>'])
-        		if(isinstance(room_result, dict)):
-        			for room in room_result:
+        		if(isinstance(livingspace_result, dict)):
+        			self.created_rooms.update(livingspace_result)
+        			for livingspace in livingspace_result:
         				print("A Living Space called {} has been successfully created!".format(
-							room))
+							livingspace))
         		else:
-        			print(room_result)
+        			print(livingspace_result)
 
     def do_add_person(self, arg):
 
@@ -187,22 +202,32 @@ class Dojo (cmd.Cmd):
 
         else:
         	if arguments['Fellow']:
-        		person_instance = Fellow()
-        		person_result = person_instance.add_person(" ".join(arguments['<person_name>']),
+        		fellow_instance = Fellow()
+        		fellow_result = fellow_instance.add_person(" ".join(arguments['<person_name>']),
 					'Fellow', arguments['<wants_accommodation>'])
-        		if (isinstance(person_result, str)):
-        			print(person_result)
+        		if (isinstance(fellow_result, str)):
+        			print(fellow_result)
         		else:
-        			print(person_result[1],person_result[0],"has been successfully added,")
+        			self.created_persons.update({fellow_result[0] : [fellow_result[1], fellow_result[2]]})
+        			print(fellow_result[1],fellow_result[0],"has been successfully added,")
+        			if(self.allocate_room(fellow_result[0])):
+        				allocations =  self.room_allocation[fellow_result[0]]
+        				print(fellow_result[1], fellow_result[0], 
+        					"has been allocated", allocations[1], allocations[0])
 
         	elif arguments['Staff']:
-        		person_instance = Staff()
-        		person_result = person_instance.add_person(" ".join(arguments['<person_name>']),
+        		staff_instance = Staff()
+        		staff_result = staff_instance.add_person(" ".join(arguments['<person_name>']),
 					'Staff', arguments['<wants_accommodation>'])
-        		if (isinstance(person_result, str)):
-        			print(person_result)
+        		if (isinstance(staff_result, str)):
+        			print(staff_result)
         		else:
-        			print(person_result[1],person_result[0],"has been successfully added,")
+        			self.created_persons.update({staff_result[0] : [staff_result[1], staff_result[2]]})
+        			print(staff_result[1],staff_result[0],"has been successfully added.")
+        			if(self.allocate_room(staff_result[0])):
+        				allocations =  self.room_allocation[staff_result[0]]
+        				print(staff_result[1], staff_result[0], 
+        					"has been allocated", allocations[1], allocations[0])
 
     def do_exit(self, arg):
         """Quits out of Interactive Mode."""
@@ -213,5 +238,5 @@ class Dojo (cmd.Cmd):
 if __name__ == '__main__':
 	try:
 		Dojo().cmdloop()
-	except Exception as e:
-		print(e)
+	except (KeyboardInterrupt, SystemExit):
+		print("System shut down. Thank you.")

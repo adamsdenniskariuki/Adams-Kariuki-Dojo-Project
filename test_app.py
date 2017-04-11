@@ -11,10 +11,10 @@ class TestApp(unittest.TestCase):
 
 	#test office is created
 	def test_create_office_successfully(self):
-		initial_room_count = len(self.office_instance.all_rooms)
+		initial_room_count = len(self.office_instance.offices)
 		blue_office = self.office_instance.create_room("Blue", "office")
 		self.assertTrue(blue_office)
-		new_room_count = len(self.office_instance.all_rooms)
+		new_room_count = len(self.office_instance.offices)
 		self.assertEqual(new_room_count - initial_room_count, 1)
 
 	#test instance of office
@@ -27,10 +27,10 @@ class TestApp(unittest.TestCase):
 
 	#test living space is created
 	def test_create_livingspace_successfully(self):
-		initial_room_count = len(self.livingspace_instance.all_rooms)
+		initial_room_count = len(self.livingspace_instance.living_spaces)
 		red_livingspace = self.livingspace_instance.create_room("Red", "livingspace")
 		self.assertTrue(red_livingspace)
-		new_room_count = len(self.livingspace_instance.all_rooms)
+		new_room_count = len(self.livingspace_instance.living_spaces)
 		self.assertEqual(new_room_count - initial_room_count, 1)
 
 	#test instance of living space
