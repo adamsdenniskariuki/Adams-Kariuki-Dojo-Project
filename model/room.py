@@ -26,6 +26,9 @@ class Office(Room):
 
 	def create_room(self, room_name, room_type):
 		super(Office, self).__init__(room_name, room_type)
+		if(isinstance(self.room_name, str)):
+			if(not self.room_name.isalpha() or not self.room_name.isalpha()):
+				return "Use alphabet (a-z) characters for the room name and room type"
 		self.offices = super(Office, self).create_room(self.room_name, self.room_type)
 		return	self.offices
 
@@ -39,5 +42,8 @@ class LivingSpace(Room):
 
 	def create_room(self, room_name, room_type):
 		super(LivingSpace, self).__init__(room_name, room_type)
+		if(isinstance(self.room_name, str)):
+			if(not self.room_name.isalpha() or not self.room_name.isalpha()):
+				return "Use alphabet (a-z) characters for the room name and room type"
 		self.living_spaces = super(LivingSpace, self).create_room(self.room_name, self.room_type)
 		return self.living_spaces
