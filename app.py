@@ -15,6 +15,82 @@ class Dojo (cmd.Cmd):
     created_persons = {}
     room_allocation = {}
 
+    #function create an office
+    def dojo_create_office(self, room_name, room_type):
+
+    	if(isinstance(room_name, list)):
+    		for room in room_name:
+    			if(not room.isalpha()):
+    				print("Use alphabet (a-z) characters for the room name and room type")
+    				return
+    	else:
+    		if(not room_name.isalpha() or not room_name.isalpha()):
+    			return "Use alphabet (a-z) characters for the room name and room type"
+
+    	office_instance = Office()
+    	office_result = office_instance.create_room(room_name, room_type)
+    	self.created_rooms.update(office_result)
+    	for office in office_result:
+    		print("An Office called {} has been successfully created!".format(office))
+
+    #function to create a living space
+    def dojo_create_livingspace(self, room_name, room_type):
+
+    	if(isinstance(room_name, list)):
+    		for room in room_name:
+    			if(not room.isalpha()):
+    				print("Use alphabet (a-z) characters for the room name and room type")
+    				return
+    	else:
+    		if(not room_name.isalpha() or not room_name.isalpha()):
+    			return "Use alphabet (a-z) characters for the room name and room type"
+
+    	livingspace_instance = LivingSpace()
+    	livingspace_result = livingspace_instance.create_room(arguments['<room_name>'], arguments['<room_type>'])
+    	self.created_rooms.update(livingspace_result)
+    	for livingspace in livingspace_result:
+    		print("A Living Space called {} has been successfully created!".format(livingspace))
+
+    #function to create a living space
+    def dojo_add_fellow(self, person_name, person_type, wants_accommodation):
+
+    	error = "Use alphabet (a-z) characters for the person name, type and wants accomodation"
+
+    	if(not wants_accommodation):
+    		wants_accommodation = 'N'
+
+    	if(not person_name.replace(' ', '').isalpha() or not person_type.isalpha() or not wants_accommodation.isalpha()):
+    		print(error)
+    		return error
+
+    	fellow_instance = Fellow()
+    	fellow_result = fellow_instance.add_person(person_name, person_type, wants_accommodation)
+    	self.created_persons.update({fellow_result[0] : [fellow_result[1], fellow_result[2]]})
+    	print(fellow_result[1],fellow_result[0],"has been successfully added,")
+    	if(self.allocate_room(fellow_result[0]) == 1):
+    		allocation =  self.room_allocation[fellow_result[0]]
+    		print(fellow_result[1], fellow_result[0],"has been allocated", allocation, self.created_rooms[allocation])
+
+    #function to create a living space
+    def dojo_add_staff(self, person_name, person_type, wants_accommodation):
+
+    	error = "Use alphabet (a-z) characters for the person name, type and wants accomodation"
+
+    	if(not wants_accommodation):
+    		wants_accommodation = 'N'
+
+    	if(not person_name.replace(' ', '').isalpha() or not person_type.isalpha() or not wants_accommodation.isalpha()):
+    		print(error)
+    		return error
+
+    	staff_instance = Staff()
+    	staff_result = staff_instance.add_person(person_name, person_type, wants_accommodation)
+    	self.created_persons.update({staff_result[0] : [staff_result[1], staff_result[2]]})
+    	print(staff_result[1],staff_result[0],"has been successfully added.")
+    	if(self.allocate_room(staff_result[0])  == 1):
+    		allocation =  self.room_allocation[staff_result[0]]
+    		print(staff_result[1], staff_result[0],"has been allocated", allocation, self.created_rooms[allocation])
+
     #function to create a room
     def do_create_room(self, arg):
 
@@ -35,18 +111,11 @@ class Dojo (cmd.Cmd):
 
         else:
         	if (arguments['<room_type>'] == "Office" or arguments['<room_type>'] == "office"):
-        		office_instance = Office()
-        		office_result = office_instance.create_room(arguments['<room_name>'], arguments['<room_type>'])
-        		self.created_rooms.update(office_result)
-        		for office in office_result:
-        			print("An Office called {} has been successfully created!".format(office))
+        		self.dojo_create_office(arguments['<room_name>'], arguments['<room_type>'])
 
         	elif (arguments['<room_type>'] == "Livingspace" or arguments['<room_type>'] == "livingspace"):
-        		livingspace_instance = LivingSpace()
-        		livingspace_result = livingspace_instance.create_room(arguments['<room_name>'], arguments['<room_type>'])
-        		self.created_rooms.update(livingspace_result)
-        		for livingspace in livingspace_result:
-        			print("A Living Space called {} has been successfully created!".format(livingspace))
+        		self.dojo_create_livingspace(arguments['<room_name>'], arguments['<room_type>'])
+        		
 
     #function to add a person
     def do_add_person(self, arg):
@@ -68,22 +137,11 @@ class Dojo (cmd.Cmd):
 
         else:
         	if arguments['Fellow']:
-        		fellow_instance = Fellow()
-        		fellow_result = fellow_instance.add_person(" ".join(arguments['<person_name>']),'Fellow', arguments['<wants_accommodation>'])
-        		self.created_persons.update({fellow_result[0] : [fellow_result[1], fellow_result[2]]})
-        		print(fellow_result[1],fellow_result[0],"has been successfully added,")
-        		if(self.allocate_room(fellow_result[0]) == 1):
-        			allocation =  self.room_allocation[fellow_result[0]]
-        			print(fellow_result[1], fellow_result[0],"has been allocated", allocation, self.created_rooms[allocation])
+        		self.dojo_add_fellow(" ".join(arguments['<person_name>']),'Fellow', arguments['<wants_accommodation>'])	
 
         	elif arguments['Staff']:
-        		staff_instance = Staff()
-        		staff_result = staff_instance.add_person(" ".join(arguments['<person_name>']),'Staff', arguments['<wants_accommodation>'])
-        		self.created_persons.update({staff_result[0] : [staff_result[1], staff_result[2]]})
-        		print(staff_result[1],staff_result[0],"has been successfully added.")
-        		if(self.allocate_room(staff_result[0])  == 1):
-        			allocation =  self.room_allocation[staff_result[0]]
-        			print(staff_result[1], staff_result[0],"has been allocated", allocation, self.created_rooms[allocation])
+        		self.dojo_add_staff(" ".join(arguments['<person_name>']),'Staff', arguments['<wants_accommodation>'])
+        		
     
     #function to allocate a room to a person
     def allocate_room(self, person_name):
