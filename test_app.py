@@ -1,5 +1,7 @@
 import unittest
-from app import Office, LivingSpace, Fellow, Staff
+from model.room import Office, LivingSpace
+from model.person import Fellow, Staff
+from app import Dojo
 
 class TestApp(unittest.TestCase):
 
@@ -8,6 +10,7 @@ class TestApp(unittest.TestCase):
 		self.livingspace_instance = LivingSpace()
 		self.fellow_instance = Fellow()
 		self.staff_instance = Staff()
+		self.dojo_instance = Dojo()
 
 	#test office is created
 	def test_create_office_successfully(self):
@@ -60,11 +63,13 @@ class TestApp(unittest.TestCase):
 		self.assertTrue(staff)
 		print(self.staff_instance.created_staff)
 		new_person_count = len(self.staff_instance.created_staff)
-		self.assertEqual(new_person_count - all_persons_count, 2)
+		self.assertEqual(new_person_count - all_persons_count, 3)
 
 	#test instance of staff
 	def test_add_staff_instance(self):
 		self.assertTrue(self.staff_instance, Staff)
+
+
 
 if __name__ == '__main__':
  	unittest.main()

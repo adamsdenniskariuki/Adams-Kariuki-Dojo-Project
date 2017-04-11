@@ -1,0 +1,47 @@
+#class to create a person
+class Person(object):
+
+	def __init__(self, person_name, person_type, wants_accommodation = 'N'):
+		self.person_name = person_name
+		self.person_type = person_type
+		self.wants_accommodation = wants_accommodation
+		self.person_created = []
+
+	def add_person(self, person_name, person_type, wants_accommodation):
+		
+		if(self.wants_accommodation and self.wants_accommodation == "Y" 
+			and self.person_type == "Staff"):
+			return "Staff are not allocated living quarters."
+		elif(not self.wants_accommodation and self.person_type == "Staff" 
+			or self.wants_accommodation == "N"):
+			self.person_created = [self.person_name, self.person_type, 'N']
+		elif(not self.wants_accommodation and self.person_type == "Fellow"):
+			self.person_created = [self.person_name, self.person_type, 'N']
+		elif(self.wants_accommodation and self.person_type == "Fellow"):
+			self.person_created = [self.person_name, self.person_type, self.wants_accommodation]
+		
+		return self.person_created
+
+
+#class to create staff
+class Staff(Person):
+
+	def __init__(self):
+		self.created_staff = []
+
+	def add_person(self, person_name, person_type, wants_accommodation = 'N'):
+		super(Staff, self).__init__(person_name, person_type, wants_accommodation)
+		self.created_staff = super(Staff, self).add_person(self.person_name, self.person_type, self.wants_accommodation)
+		return self.created_staff
+		
+
+#class to create a fellow
+class Fellow(Person):
+	
+	def __init__(self):
+		self.created_fellow = []
+
+	def add_person(self, person_name, person_type, wants_accommodation = 'N'):
+		super(Fellow, self).__init__(person_name, person_type, wants_accommodation)
+		self.created_fellow = super(Fellow, self).add_person(self.person_name, self.person_type, self.wants_accommodation)
+		return self.created_fellow
