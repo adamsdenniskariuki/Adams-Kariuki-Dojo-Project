@@ -6,6 +6,7 @@ Usage:
 	app.py create_room <room_type> <room_name>...
 	app.py add_person (<person_name> <person_name>) (Fellow|Staff) [<wants_accommodation>]
 	app.py (-h | --help)
+	app.py (-i | --interactive)
 
 Arguments:
 	<room_type> Office or Living Space
@@ -16,17 +17,12 @@ Arguments:
 
 Options:
 	-h, --help	show this message
+	-i, --interactive  Interactive Mode
 """
 
 
-class Dojo(object):
-
-	def __init__(self):
-		pass
-
-
 #class to create a room
-class Room(Dojo):
+class Room(object):
 	
 	def __init__(self, room_name, room_type):
 		self.created_rooms = {}
@@ -120,61 +116,102 @@ class Fellow(Person):
 			self.person_type, self.wants_accommodation)
 		return self.created_fellow
 		
-
+import cmd
+import sys
 from docopt import docopt, DocoptExit
 from pprint import pprint
 
+
+#class to make the app interactive
+class Dojo (cmd.Cmd):
+    intro   = '\nWelcome to the dojo program!\n\nType help for assistance and exit to leave.\n'
+    prompt  = 'Dojo >>>'
+    file    = None
+
+    def do_create_room(self, arg):
+
+        """
+        Usage: 
+            create_room <room_type> <room_name>...
+        """
+
+        try: 
+            arguments = docopt(self.do_create_room.__doc__, arg)
+
+        except  DocoptExit as e:
+            print('Invalid Command!')
+            print(e)
+
+        except SystemExit:
+            pass
+
+        else:
+        	if arguments['<room_type>'] == "Office":
+        		room_instance = Office()
+        		room_result = room_instance.create_room(
+					arguments['<room_name>'], arguments['<room_type>'])
+        		if(isinstance(room_result, dict)):
+        			for room in room_result:
+        				print("An Office called {} has been successfully created!".format(
+							room))
+        		else:
+        			print(room_result)
+
+        	elif arguments['<room_type>'] == "Livingspace":
+        		room_instance = LivingSpace()
+        		room_result = room_instance.create_room(
+        			arguments['<room_name>'], arguments['<room_type>'])
+        		if(isinstance(room_result, dict)):
+        			for room in room_result:
+        				print("A Living Space called {} has been successfully created!".format(
+							room))
+        		else:
+        			print(room_result)
+
+    def do_add_person(self, arg):
+
+        """
+        Usage: 
+            add_person (<person_name> <person_name>) (Fellow|Staff) [<wants_accommodation>]
+        """
+
+        try: 
+            arguments = docopt(self.do_add_person.__doc__, arg)
+
+        except  DocoptExit as e:
+            print('Invalid Command!')
+            print(e)
+
+        except SystemExit:
+            pass
+
+        else:
+        	if arguments['Fellow']:
+        		person_instance = Fellow()
+        		person_result = person_instance.add_person(" ".join(arguments['<person_name>']),
+					'Fellow', arguments['<wants_accommodation>'])
+        		if (isinstance(person_result, str)):
+        			print(person_result)
+        		else:
+        			print(person_result[1],person_result[0],"has been successfully added,")
+
+        	elif arguments['Staff']:
+        		person_instance = Staff()
+        		person_result = person_instance.add_person(" ".join(arguments['<person_name>']),
+					'Staff', arguments['<wants_accommodation>'])
+        		if (isinstance(person_result, str)):
+        			print(person_result)
+        		else:
+        			print(person_result[1],person_result[0],"has been successfully added,")
+
+    def do_exit(self, arg):
+        """Quits out of Interactive Mode."""
+
+        print('Good Bye!')
+        return True
+
 if __name__ == '__main__':
 	try:
-		arguments = docopt(__doc__)
-
-	except  DocoptExit as e:
-		print('Invalid Command!')
+		Dojo().cmdloop()
+	except Exception as e:
 		print(e)
-
-	except SystemExit:
-		pass
-
-	else:
-		if arguments['create_room'] and arguments['<room_type>'] == "Office":
-			room_instance = Office()
-			room_result = room_instance.create_room(
-				arguments['<room_name>'], arguments['<room_type>'])
-			if(isinstance(room_result, dict)):
-				for room in room_result:
-					print("An Office called {} has been successfully created!".format(
-						room))
-			else:
-				print(room_result)
-		
-		elif arguments['create_room'] and arguments['<room_type>'] == "Livingspace":
-			room_instance = LivingSpace()
-			room_result = room_instance.create_room(
-				arguments['<room_name>'], arguments['<room_type>'])
-			if(isinstance(room_result, dict)):
-				for room in room_result:
-					print("A Living Space called {} has been successfully created!".format(
-						room))
-			else:
-				print(room_result)
-
-		elif arguments['add_person'] and arguments['Fellow']:
-			person_instance = Fellow()
-			person_result = person_instance.add_person(" ".join(arguments['<person_name>']),
-				'Fellow', arguments['<wants_accommodation>'])
-			if (isinstance(person_result, str)):
-				print(person_result)
-			else:
-				print(person_result[1],person_result[0],"has been successfully added,")
-			
-
-		elif arguments['add_person'] and arguments['Staff']:
-			person_instance = Staff()
-			person_result = person_instance.add_person(" ".join(arguments['<person_name>']),
-				'Staff', arguments['<wants_accommodation>'])
-			if (isinstance(person_result, str)):
-				print(person_result)
-			else:
-				print(person_result[1],person_result[0],"has been successfully added,")
-
-
