@@ -1,5 +1,6 @@
 import cmd
 import random
+import os
 from model.room import Room, Office, LivingSpace
 from model.person import Person, Staff, Fellow
 from docopt import docopt, DocoptExit
@@ -87,7 +88,7 @@ class Dojo (cmd.Cmd):
     #function to allocate a room to a person
     def allocate_room(self, person_name):
     	office_max_occupants = Office().max_occupants
-    	livingspace_max_occupants = Office().max_occupants
+    	livingspace_max_occupants = LivingSpace().max_occupants
 
     	if(len(self.created_rooms) > 0):
     		rooms_list = []
@@ -96,9 +97,99 @@ class Dojo (cmd.Cmd):
 
     		random_key = random.randint(0 , len(rooms_list) - 1)
     		room_allocated = rooms_list[random_key]
-    		self.room_allocation.update({person_name:room_allocated})
+    		count = 1
+    		if(self.created_rooms):
+    			for key, value in self.room_allocation.items():
+    				if value == room_allocated:
+    					count += 1
+    			if(self.created_rooms[room_allocated] == "Office" and count <= office_max_occupants):
+    				self.room_allocation.update({person_name:room_allocated})
+    				return 1
+    			elif(self.created_rooms[room_allocated] == "Livingspace" and count <= livingspace_max_occupants):
+    				self.room_allocation.update({person_name:room_allocated})
+    				return 1
+    			else:
+    				return 0
 
-    		return 1
+    #function to show specific room allocation
+    def do_print_room(self, arg):
+    	
+    	"""
+        Usage: 
+            print_room <room_name>
+        """
+    	
+    	try:
+    		arguments = docopt(self.do_print_room.__doc__, arg)
+
+    	except DocoptExit as e:
+        	print('Invalid Command!')
+        	print(e)
+
+    	except (KeyboardInterrupt, SystemExit):
+    		print("System shut down. Thank you.")
+
+    	else:
+        	if(len(self.room_allocation) == 0):
+        		print("No rooms allocated")
+        	else:
+        		for key, value in self.room_allocation.items():
+        			if value == arguments['<room_name>']:
+        				print(key)
+        			
+
+    #function to show room allocations
+    def do_print_allocations(self, arg):
+    	
+    	"""
+        Usage:
+        	print_allocations [-o=<filename>]
+        """
+    	
+    	try:
+    		arguments = docopt(self.do_print_allocations.__doc__, arg)
+
+    	except DocoptExit as e:
+        	print('Invalid Command!')
+        	print(e)
+
+    	except (KeyboardInterrupt, SystemExit):
+    		print("System shut down. Thank you.")
+
+    	else:
+    		if(self.room_allocation):
+    			for key, values in self.room_allocation.items():
+    				print(key, values)
+    		else:
+    			print("No room allocations")
+
+    #function display unallocated persons
+    def do_print_unallocated(self, arg):
+    	
+    	"""
+        Usage:
+        	print_unallocated [-o=<filename>]
+        """
+    	
+    	try:
+    		arguments = docopt(self.do_print_unallocated.__doc__, arg)
+
+    	except DocoptExit as e:
+        	print('Invalid Command!')
+        	print(e)
+
+    	except (KeyboardInterrupt, SystemExit):
+    		print("System shut down. Thank you.")
+
+    	else:
+    		if(self.created_persons and self.room_allocation):
+    			found = 1
+    			for key, values in self.created_persons.items():
+    				if key not in self.room_allocation:
+    					print(key)
+
+    		else:
+    			print("No room allocations")
 
     #function to exit when 'exit' is typed
     def do_exit(self, arg):
@@ -106,6 +197,9 @@ class Dojo (cmd.Cmd):
 
         print('Good Bye!')
         return True
+
+    def do_cls(self, arg):
+    	os.system('cls')
 
 #execute main code block
 if __name__ == '__main__':
