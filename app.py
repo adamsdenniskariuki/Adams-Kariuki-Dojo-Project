@@ -10,7 +10,6 @@ from docopt import docopt, DocoptExit
 class Dojo (cmd.Cmd):
     intro   = '\nWelcome to the dojo program!\n\nType help for assistance and exit to leave.\n'
     prompt  = 'Dojo >>>'
-    file    = None
     created_rooms = {}
     created_persons = {}
     room_allocation = {}
@@ -51,7 +50,7 @@ class Dojo (cmd.Cmd):
     	for livingspace in livingspace_result:
     		print("A Living Space called {} has been successfully created!".format(livingspace))
 
-    #function to create a living space
+    #function to add a fellow
     def dojo_add_fellow(self, person_name, person_type, wants_accommodation):
 
     	error = "Use alphabet (a-z) characters for the person name, type and wants accomodation"
@@ -59,9 +58,13 @@ class Dojo (cmd.Cmd):
     	if(not wants_accommodation):
     		wants_accommodation = 'N'
 
-    	if(not person_name.replace(' ', '').isalpha() or not person_type.isalpha() or not wants_accommodation.isalpha()):
+    	elif(not person_name.replace(' ', '').isalpha() or not person_type.isalpha() or not wants_accommodation.isalpha()):
     		print(error)
     		return error
+
+    	elif(self.created_persons and (person_name in self.created_persons)):
+    		print(person_type, person_name, "Already exists!")
+    		return
 
     	fellow_instance = Fellow()
     	fellow_result = fellow_instance.add_person(person_name, person_type, wants_accommodation)
@@ -71,7 +74,7 @@ class Dojo (cmd.Cmd):
     		allocation =  self.room_allocation[fellow_result[0]]
     		print(fellow_result[1], fellow_result[0],"has been allocated", allocation, self.created_rooms[allocation])
 
-    #function to create a living space
+    #function to add a staff
     def dojo_add_staff(self, person_name, person_type, wants_accommodation):
 
     	error = "Use alphabet (a-z) characters for the person name, type and wants accomodation"
@@ -79,9 +82,13 @@ class Dojo (cmd.Cmd):
     	if(not wants_accommodation):
     		wants_accommodation = 'N'
 
-    	if(not person_name.replace(' ', '').isalpha() or not person_type.isalpha() or not wants_accommodation.isalpha()):
+    	elif(not person_name.replace(' ', '').isalpha() or not person_type.isalpha() or not wants_accommodation.isalpha()):
     		print(error)
     		return error
+
+    	elif(self.created_persons and (person_name in self.created_persons)):
+    		print(person_type, person_name, "Already exists!")
+    		return
 
     	staff_instance = Staff()
     	staff_result = staff_instance.add_person(person_name, person_type, wants_accommodation)
@@ -91,7 +98,26 @@ class Dojo (cmd.Cmd):
     		allocation =  self.room_allocation[staff_result[0]]
     		print(staff_result[1], staff_result[0],"has been allocated", allocation, self.created_rooms[allocation])
 
-    #function to create a room
+    #function to create a file
+    def dojo_create_file(self, filename, data = {}):
+
+    	if(not filename.isalpha()):
+    		return "Use alphabet (a-z) characters for the file name"
+    	else:
+    		filename = ''.join(["files/", filename, ".txt"])
+    		if(os.path.exists(filename)):
+    			 return "The file already exists. Choose another file name."
+    		file_handler = open(filename, "w")
+    		if(isinstance(data, list)):
+    			for key in data:
+    				file_handler.write(' '.join([key, '\n']))
+    		else:
+    			for key, value in data.items():
+    				file_handler.write(' '.join([key, value, '\n']))
+    		file_handler.close()
+    		return "File {} created".format(filename)
+
+    #function to get inputs to create a room
     def do_create_room(self, arg):
 
         """
@@ -117,7 +143,7 @@ class Dojo (cmd.Cmd):
         		self.dojo_create_livingspace(arguments['<room_name>'], arguments['<room_type>'])
         		
 
-    #function to add a person
+    #function to get inputs to add a person
     def do_add_person(self, arg):
 
         """
@@ -201,7 +227,7 @@ class Dojo (cmd.Cmd):
     	
     	"""
         Usage:
-        	print_allocations [-o=<filename>]
+        	print_allocations [-o FILE]
         """
     	
     	try:
@@ -216,8 +242,11 @@ class Dojo (cmd.Cmd):
 
     	else:
     		if(self.room_allocation):
+    			allocated_persons = {}
     			for key, values in self.room_allocation.items():
     				print(key, values)
+    			if(arguments['FILE'] and arguments['-o']):
+    				print(self.dojo_create_file(arguments['FILE'], self.room_allocation))
     		else:
     			print("No room allocations")
 
@@ -226,7 +255,7 @@ class Dojo (cmd.Cmd):
     	
     	"""
         Usage:
-        	print_unallocated [-o=<filename>]
+        	print_unallocated [-o FILE]
         """
     	
     	try:
@@ -241,10 +270,13 @@ class Dojo (cmd.Cmd):
 
     	else:
     		if(self.created_persons and self.room_allocation):
-    			found = 1
+    			unallocated = []
     			for key, values in self.created_persons.items():
     				if key not in self.room_allocation:
+    					unallocated.append(key)
     					print(key)
+    			if(arguments['FILE'] and arguments['-o']):
+    				print(self.dojo_create_file(arguments['FILE'], unallocated))
 
     		else:
     			print("No room allocations")
