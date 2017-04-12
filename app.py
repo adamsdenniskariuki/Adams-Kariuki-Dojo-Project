@@ -8,8 +8,8 @@ from docopt import docopt, DocoptExit
 
 #class to make the app interactive
 class Dojo (cmd.Cmd):
-    intro   = '\nWelcome to the dojo program!\n\nType help for assistance and exit to leave.\n'
-    prompt  = 'Dojo >>>'
+    intro   = '\nWelcome to the dojo program!\n\nType help for assistance and exit to leave.'
+    prompt  = '\nDojo >>>'
     created_rooms = {}
     created_persons = {}
     room_allocation = {}
@@ -302,6 +302,82 @@ class Dojo (cmd.Cmd):
 
     		else:
     			print("No room allocations")
+
+    #function to reallocate persons
+    def dojo_reallocate_person(self, person_identifier, new_room_name):
+
+    	full_name = ' '.join(person_identifier)
+
+    	if(self.created_persons and full_name not in self.created_persons):
+    		return "Person {} does not exist".format(full_name)
+    	if(not full_name.isalpha() or not new_room_name.isalpha()):
+    		return "Use alphabet (a-z) characters for the person name and room name"
+    	elif(self.created_rooms and new_room_name not in self.created_rooms):
+    		return "Room {} does not exist".format(new_room_name)
+    	else:
+    		self.room_allocation[full_name] = new_room_name
+    		return "{} has been allocated to {}".format(full_name, new_room_name)
+
+
+    #function to take variables to reallocate persons
+    def do_reallocate_person(self, arg):
+    	
+    	"""
+        Usage:
+        	reallocate_person <person_identifier> [<person_identifier>] <new_room_name>
+        """
+
+    	try:
+        	arguments = docopt(self.do_reallocate_person.__doc__, arg)
+
+    	except DocoptExit as e:
+        	print('Invalid Command!')
+        	print(e)
+
+    	except (KeyboardInterrupt, SystemExit):
+        	print("System shut down. Thank you.")
+
+    	else:
+        	if(self.room_allocation):
+        		print(self.dojo_reallocate_person(arguments['<person_identifier>'], arguments['<new_room_name>']))
+        	else:
+        		print("No room allocations")
+
+    #function to take variables to reallocate persons
+    def do_load_people(self, arg):
+    	
+    	"""
+        Usage:
+        	load_people
+        """
+
+    	try:
+        	arguments = docopt(self.do_load_people.__doc__, arg)
+
+    	except DocoptExit as e:
+        	print('Invalid Command!')
+        	print(e)
+
+    	except (KeyboardInterrupt, SystemExit):
+        	print("System shut down. Thank you.")
+
+    	else:
+    		if(os.stat('files/load.txt').st_size == 0):
+    			print("The file is empty")
+    			return
+    		with open('files/load.txt') as f:
+        		file_input = [line.strip() for line in f.readlines()]
+        		for people in file_input:
+        			full_name = ' '.join([people.split()[0], people.split()[1]])
+        			person_type = people.split()[2]
+        			if(len(people.split()) == 4):
+        				wants_accommodation = people.split()[3]
+        			else:
+        				wants_accommodation = 'N'
+        			if(person_type == "FELLOW"):
+        				self.dojo_add_fellow(full_name, person_type, wants_accommodation)
+        			else:
+        				self.dojo_add_staff(full_name, person_type, wants_accommodation)      			
 
     #function to exit when 'exit' is typed
     def do_exit(self, arg):

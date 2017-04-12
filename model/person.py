@@ -10,9 +10,9 @@ class Person(object):
 	def add_person(self, person_name, person_type, wants_accommodation):
 		if(self.wants_accommodation is not 'N' and self.person_type == "Staff"):
 			return "Staff are not allocated living quarters."
-		elif(self.person_type == "Staff"):
+		elif(self.person_type == "Staff" or self.person_type == "STAFF"):
 			self.person_created = [self.person_name, self.person_type, 'N']
-		elif(self.person_type == "Fellow" and self.wants_accommodation is "Y"  or self.wants_accommodation is "N"):
+		elif(self.person_type == "Fellow" or self.person_type == "FELLOW" and self.wants_accommodation is "Y"  or self.wants_accommodation is "N"):
 			self.person_created = [self.person_name, self.person_type, wants_accommodation]
 		elif(self.wants_accommodation is not "N" or self.wants_accommodation is not "Y"):
 			return "Invalid value for accomodation. Use Y or N"
