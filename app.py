@@ -56,7 +56,7 @@ class Dojo (cmd.Cmd):
     			return "Use alphabet (a-z) characters for the room name and room type"
 
     	livingspace_instance = LivingSpace()
-    	livingspace_result = livingspace_instance.create_room(arguments['<room_name>'], arguments['<room_type>'])
+    	livingspace_result = livingspace_instance.create_room(room_name, room_type)
     	self.created_rooms.update(livingspace_result)
     	for livingspace in livingspace_result:
     		print("A Living Space called {} has been successfully created!".format(livingspace))
@@ -157,11 +157,12 @@ class Dojo (cmd.Cmd):
         	print("System shut down. Thank you.")
 
         else:
-        	if (arguments['<room_type>'] == "Office" or arguments['<room_type>'] == "office"):
+        	if(arguments['<room_type>'] == "Office" or arguments['<room_type>'] == "office"):
         		self.dojo_create_office(arguments['<room_name>'], arguments['<room_type>'])
-
-        	elif (arguments['<room_type>'] == "Livingspace" or arguments['<room_type>'] == "livingspace"):
+        	elif(arguments['<room_type>'] == "Livingspace" or arguments['<room_type>'] == "livingspace"):
         		self.dojo_create_livingspace(arguments['<room_name>'], arguments['<room_type>'])
+        	else:
+        		print("Indicate the office type: Office or Livingspace")
         		
 
     #function to get inputs to add a person
