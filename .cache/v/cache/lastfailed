@@ -1,0 +1,7 @@
+{
+  "tests/test_dojo.py": true,
+  "tests/test_fellow.py": true,
+  "tests/test_livingspace.py": true,
+  "tests/test_office.py": true,
+  "tests/test_staff.py": true
+}
