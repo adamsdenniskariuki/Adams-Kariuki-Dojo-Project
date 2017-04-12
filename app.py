@@ -1,6 +1,7 @@
 import cmd
 import random
 import os
+import sqlite3
 from model.room import Room, Office, LivingSpace
 from model.person import Person, Staff, Fellow
 from docopt import docopt, DocoptExit
@@ -13,6 +14,7 @@ class Dojo (cmd.Cmd):
     created_rooms = {}
     created_persons = {}
     room_allocation = {}
+    living_allocation = {}
 
     #function create an office
     def dojo_create_office(self, room_name, room_type):
@@ -83,11 +85,17 @@ class Dojo (cmd.Cmd):
     		return
     	self.created_persons.update({fellow_result[0] : [fellow_result[1], fellow_result[2]]})
     	print(fellow_result[1],fellow_result[0],"has been successfully added,")
-    	if(self.allocate_room(fellow_result[0]) == 1):
-    		allocation =  self.room_allocation[fellow_result[0]]
-    		print(fellow_result[1], fellow_result[0],"has been allocated", allocation, self.created_rooms[allocation])
+    	if(self.allocate_office(fellow_result[0]) == 1 ):
+    		officeallocation =  self.room_allocation[fellow_result[0]]
+    		print(fellow_result[1], fellow_result[0],"has been allocated", officeallocation, self.created_rooms[officeallocation])
     	else:
-    		print("No rooms available for allocation")
+    		print("No offices available for allocation")
+
+    	if(wants_accommodation == 'Y' and self.allocate_livingspace(fellow_result[0]) == 1 ):
+    		livingallocation =  self.living_allocation[fellow_result[0]]
+    		print(fellow_result[1], fellow_result[0],"has been allocated", livingallocation, self.created_rooms[livingallocation])
+    	else:
+    		print("No living spaces allocated")
 
     #function to add a staff
     def dojo_add_staff(self, person_name, person_type, wants_accommodation):
@@ -112,11 +120,11 @@ class Dojo (cmd.Cmd):
     		return
     	self.created_persons.update({staff_result[0] : [staff_result[1], staff_result[2]]})
     	print(staff_result[1],staff_result[0],"has been successfully added.")
-    	if(self.allocate_room(staff_result[0])  == 1):
+    	if(self.allocate_office(staff_result[0])  == 1):
     		allocation =  self.room_allocation[staff_result[0]]
     		print(staff_result[1], staff_result[0],"has been allocated", allocation, self.created_rooms[allocation])
     	else:
-    		print("No rooms available for allocation")
+    		print("No offices available for allocation")
 
     #function to create a file
     def dojo_create_file(self, filename, data = {}):
@@ -132,15 +140,22 @@ class Dojo (cmd.Cmd):
     			for key in data:
     				file_handler.write(' '.join([key, '\n']))
     		else:
-    			allocated = []
-    			for key, value in data.items():
-    				allocated.append(value)
-    			allocated = list(set(allocated))
-    			for allocation in allocated:
-    				file_handler.write(allocation)
-    				file_handler.write('\n=======================================\n')
-    				file_handler.write(','.join([name for name, room in data.items() if room == allocation]))
-    				file_handler.write('\n\n')
+    			if(self.living_allocation):
+	    			allocated = self.living_allocation.values()
+	    			allocated = list(set(allocated))
+	    			for allocation in allocated:
+	    				file_handler.write(allocation)
+	    				file_handler.write('\n=======================================\n')
+	    				file_handler.write(','.join([name for name, room in self.living_allocation.items() if room == allocation]))
+	    				file_handler.write('\n\n')
+	    		if(self.room_allocation):
+	    			allocated = self.room_allocation.values()
+	    			allocated = list(set(allocated))
+	    			for allocation in allocated:
+	    				file_handler.write(allocation)
+	    				file_handler.write('\n=======================================\n')
+	    				file_handler.write(','.join([name for name, room in self.room_allocation.items() if room == allocation]))
+	    				file_handler.write('\n\n')
     		file_handler.close()
     		return "File {} created".format(filename)
 
@@ -198,9 +213,8 @@ class Dojo (cmd.Cmd):
         		
     
     #function to allocate a room to a person
-    def allocate_room(self, person_name):
+    def allocate_office(self, person_name):
     	office_max_occupants = Office().max_occupants
-    	livingspace_max_occupants = LivingSpace().max_occupants
 
     	if(len(self.created_rooms) > 0):
     		
@@ -213,8 +227,21 @@ class Dojo (cmd.Cmd):
     			if(room_type == "Office" and count <= office_max_occupants):
     				self.room_allocation.update({person_name:room_name})
     				return 1
-    			elif(room_type == "Livingspace" and count <= livingspace_max_occupants):
-    				self.room_allocation.update({person_name:room_name})
+
+    #function to allocate a livingspace to a person
+    def allocate_livingspace(self, person_name):
+    	livingspace_max_occupants = LivingSpace().max_occupants
+
+    	if(len(self.created_rooms) > 0):
+    		
+    		for room_name,room_type in self.created_rooms.items():
+    			count = 1
+    			for key, value in self.living_allocation.items():
+    				if value == room_name:
+    					count += 1
+
+    			if(room_type == "Livingspace" and count <= livingspace_max_occupants):
+    				self.living_allocation.update({person_name:room_name})
     				return 1
 
     #function to show specific room allocation
@@ -236,12 +263,18 @@ class Dojo (cmd.Cmd):
     		print("System shut down. Thank you.")
 
     	else:
-        	if(len(self.room_allocation) == 0):
-        		print("No rooms allocated")
-        	else:
+        	if(len(self.room_allocation) != 0):
         		for key, value in self.room_allocation.items():
         			if value == arguments['<room_name>']:
-        				print(key)
+        				print(key,'office',value)
+        	else:
+        		print("No rooms allocated")
+        	if(len(self.living_allocation) != 0):
+        		for key, value in self.living_allocation.items():
+        			if value == arguments['<room_name>']:
+        				print(key,'living space',value)
+        	else:
+        		print("No rooms allocated")
         			
 
     #function to show room allocations
@@ -264,11 +297,12 @@ class Dojo (cmd.Cmd):
 
     	else:
     		if(self.room_allocation):
-    			allocated_persons = {}
     			for key, values in self.room_allocation.items():
     				print(key, values)
+    			for key, values in self.living_allocation.items():
+    				print(key, values)
     			if(arguments['FILE'] and arguments['-o']):
-    				print(self.dojo_create_file(arguments['FILE'], self.room_allocation))
+    				print(self.dojo_create_file(arguments['FILE'], {'allocation':1}))
     		else:
     			print("No room allocations")
 
@@ -291,17 +325,20 @@ class Dojo (cmd.Cmd):
     		print("System shut down. Thank you.")
 
     	else:
-    		if(self.created_persons and self.room_allocation):
-    			unallocated = []
+    		unallocated = []
+    		if(self.created_persons):
     			for key, values in self.created_persons.items():
     				if key not in self.room_allocation:
     					unallocated.append(key)
-    					print(key)
+    				if key not in self.living_allocation:
+    					unallocated.append(key)
+    				unallocated = list(set(unallocated))
+    				print(''.join(unallocated))
+    		else:
+    			print("No persons created") 
+    				
     			if(arguments['FILE'] and arguments['-o']):
     				print(self.dojo_create_file(arguments['FILE'], unallocated))
-
-    		else:
-    			print("No room allocations")
 
     #function to reallocate persons
     def dojo_reallocate_person(self, person_identifier, new_room_name):
@@ -310,13 +347,17 @@ class Dojo (cmd.Cmd):
 
     	if(self.created_persons and full_name not in self.created_persons):
     		return "Person {} does not exist".format(full_name)
-    	if(not full_name.isalpha() or not new_room_name.isalpha()):
-    		return "Use alphabet (a-z) characters for the person name and room name"
     	elif(self.created_rooms and new_room_name not in self.created_rooms):
     		return "Room {} does not exist".format(new_room_name)
     	else:
-    		self.room_allocation[full_name] = new_room_name
-    		return "{} has been allocated to {}".format(full_name, new_room_name)
+    		if(self.room_allocation[full_name]):
+    			self.room_allocation[full_name] = new_room_name
+    			return "{} has been allocated to {}".format(full_name, new_room_name)
+    		
+    		if(self.living_allocation[full_name]):
+    			self.living_allocation[full_name] = new_room_name
+    			return "{} has been allocated to {}".format(full_name, new_room_name)
+    		
 
 
     #function to take variables to reallocate persons
@@ -377,7 +418,96 @@ class Dojo (cmd.Cmd):
         			if(person_type == "FELLOW"):
         				self.dojo_add_fellow(full_name, person_type, wants_accommodation)
         			else:
-        				self.dojo_add_staff(full_name, person_type, wants_accommodation)      			
+        				self.dojo_add_staff(full_name, person_type, wants_accommodation)
+    
+    #function to save state to db
+    def do_save_state(self, arg):
+    	
+    	"""
+        Usage:
+        	save_state
+        """
+
+    	try:
+        	arguments = docopt(self.do_save_state.__doc__, arg)
+
+    	except DocoptExit as e:
+        	print('Invalid Command!')
+        	print(e)
+
+    	except (KeyboardInterrupt, SystemExit):
+        	print("System shut down. Thank you.")
+
+    	else:
+    		try:
+	        	connection = sqlite3.connect(r"E:/Dojo/v2/Adams-Kariuki-Dojo-Project/db/dojodb")
+	        	db_cursor = connection.cursor()
+	        	db_cursor.execute('CREATE TABLE IF NOT EXISTS dojo_room (room_name text PRIMARY KEY, room_type text not null);')
+	        	db_cursor.execute('CREATE TABLE IF NOT EXISTS dojo_person (person_name text PRIMARY KEY, person_type text not null, wants_accomodation text not null);')
+	        	db_cursor.execute('CREATE TABLE IF NOT EXISTS dojo_allocation (person_name text not null, room_name text not null);')
+	        	if(self.created_rooms):
+	        		for key, val in self.created_rooms.items():
+	        			db_cursor.execute("INSERT OR REPLACE INTO dojo_room (room_name, room_type) VALUES ('{v1}', '{v2}')".format(v1=key, v2=val))
+	        	if(self.created_persons):
+	        		for key, val in self.created_persons.items():
+	        			db_cursor.execute("INSERT OR REPLACE INTO dojo_person (person_name, person_type, wants_accomodation) VALUES ('{v1}', '{v2}', '{v3}')".format(v1=key, v2=val[0], v3=val[1]))
+	        	if(self.room_allocation):
+	        		for key, val in self.room_allocation.items():
+	        			db_cursor.execute("INSERT OR REPLACE INTO dojo_allocation (person_name, room_name) VALUES ('{v1}', '{v2}')".format(v1=key, v2=val))
+	        	if(self.living_allocation):
+	        		for key, val in self.living_allocation.items():
+	        			db_cursor.execute("INSERT OR REPLACE INTO dojo_allocation (person_name, room_name) VALUES ('{v1}', '{v2}')".format(v1=key, v2=val))
+	        	connection.commit()
+	        	connection.close()
+	    	except Exception as e:
+	        	print('Error:',e)
+
+    #function to load state from db
+    def do_load_state(self, arg):
+    	
+    	"""
+        Usage:
+        	load_state [<dojodb>]
+        """
+
+    	try:
+        	arguments = docopt(self.do_load_state.__doc__, arg)
+
+    	except DocoptExit as e:
+        	print('Invalid Command!')
+        	print(e)
+
+    	except (KeyboardInterrupt, SystemExit):
+        	print("System shut down. Thank you.")
+
+    	else:
+    		try:
+    			path = r'E:/Dojo/v2/Adams-Kariuki-Dojo-Project/db/dojodb'
+    			if(arguments['<dojodb>'] and arguments['<dojodb>'].isalpha()):
+	    			path = ''.join(['E:/Dojo/v2/Adams-Kariuki-Dojo-Project/db/', arguments['<dojodb>']])
+		    		if(os.path.exists(path) == False):
+		    			print("database {} does not exist.".format(arguments['<dojodb>']))
+		    		else:
+			    		connection = sqlite3.connect(path)
+			    		db_cursor = connection.cursor()
+			    		db_cursor.execute('SELECT * FROM dojo_person')
+			    		for room_data in db_cursor.fetchall():
+			    			self.created_persons.update({room_data[0]:[room_data[1], room_data[2]]})
+			    		db_cursor.execute('SELECT * FROM dojo_room')
+			    		for room_data in db_cursor.fetchall():
+			    			self.created_rooms.update({room_data[0]: room_data[1]})
+			    		db_cursor.execute('SELECT * FROM dojo_allocation')
+			    		for room_data in db_cursor.fetchall():
+			    			if(self.created_rooms[room_data[1]] == 'Office'):
+			    				self.room_allocation.update({room_data[0]: room_data[1]})
+			    			else:
+			    				self.living_allocation.update({room_data[0]: room_data[1]})
+	    				connection.close()
+	    				print("Data loaded...")
+	    		else:
+	    			print("Use alphabet (a-z) characters for the database name")
+	    	except Exception as e:
+	        	print('Error:',e)     			
 
     #function to exit when 'exit' is typed
     def do_exit(self, arg):
