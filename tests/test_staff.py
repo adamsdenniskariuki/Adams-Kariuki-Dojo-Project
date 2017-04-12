@@ -1,5 +1,4 @@
 import unittest
-from .  import *
 from model.person import Staff
 
 #class to test the Staff class

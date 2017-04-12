@@ -1,5 +1,4 @@
 import unittest
-from .  import *
 from app import Dojo
 
 #class to test the Dojo class

@@ -1,5 +1,4 @@
 import unittest
-from .  import *
 from model.room import LivingSpace
 
 #class to test the LivingSpace class

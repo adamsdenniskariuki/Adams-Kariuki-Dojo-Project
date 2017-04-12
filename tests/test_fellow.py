@@ -1,5 +1,4 @@
 import unittest
-from .  import *
 from model.person import Fellow
 
 #class to test the Fellow class

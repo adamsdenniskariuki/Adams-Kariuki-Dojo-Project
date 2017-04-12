@@ -1,5 +1,4 @@
 import unittest
-from .  import *
 from model.room import Office
 
 #class to test the Office class
