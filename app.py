@@ -17,7 +17,13 @@ class Dojo (cmd.Cmd):
     #function create an office
     def dojo_create_office(self, room_name, room_type):
 
+    	
     	if(isinstance(room_name, list)):
+    		if(self.created_rooms):
+    			for r in room_name:
+    				if(r in self.created_rooms):
+    					print("Room already exists!")
+    					return
     		for room in room_name:
     			if(not room.isalpha()):
     				print("Use alphabet (a-z) characters for the room name and room type")
@@ -36,6 +42,11 @@ class Dojo (cmd.Cmd):
     def dojo_create_livingspace(self, room_name, room_type):
 
     	if(isinstance(room_name, list)):
+    		if(self.created_rooms):
+    			for r in room_name:
+    				if(r in self.created_rooms):
+    					print("Room already exists!")
+    					return
     		for room in room_name:
     			if(not room.isalpha()):
     				print("Use alphabet (a-z) characters for the room name and room type")
@@ -58,21 +69,26 @@ class Dojo (cmd.Cmd):
     	if(not wants_accommodation):
     		wants_accommodation = 'N'
 
-    	elif(not person_name.replace(' ', '').isalpha() or not person_type.isalpha() or not wants_accommodation.isalpha()):
-    		print(error)
-    		return error
-
-    	elif(self.created_persons and (person_name in self.created_persons)):
+    	if(person_name in self.created_persons):
     		print(person_type, person_name, "Already exists!")
     		return
 
+    	if(not person_name.replace(' ', '').isalpha() or not person_type.isalpha() or not wants_accommodation.isalpha()):
+    		print(error)
+    		return error
+
     	fellow_instance = Fellow()
     	fellow_result = fellow_instance.add_person(person_name, person_type, wants_accommodation)
+    	if(not isinstance(fellow_result, list)):
+    		print(fellow_result)
+    		return
     	self.created_persons.update({fellow_result[0] : [fellow_result[1], fellow_result[2]]})
     	print(fellow_result[1],fellow_result[0],"has been successfully added,")
     	if(self.allocate_room(fellow_result[0]) == 1):
     		allocation =  self.room_allocation[fellow_result[0]]
     		print(fellow_result[1], fellow_result[0],"has been allocated", allocation, self.created_rooms[allocation])
+    	else:
+    		print("No rooms available for allocation")
 
     #function to add a staff
     def dojo_add_staff(self, person_name, person_type, wants_accommodation):
@@ -82,21 +98,26 @@ class Dojo (cmd.Cmd):
     	if(not wants_accommodation):
     		wants_accommodation = 'N'
 
-    	elif(not person_name.replace(' ', '').isalpha() or not person_type.isalpha() or not wants_accommodation.isalpha()):
-    		print(error)
-    		return error
-
-    	elif(self.created_persons and (person_name in self.created_persons)):
+    	if(person_name in self.created_persons):
     		print(person_type, person_name, "Already exists!")
     		return
 
+    	if(not person_name.replace(' ', '').isalpha() or not person_type.isalpha() or not wants_accommodation.isalpha()):
+    		print(error)
+    		return error
+
     	staff_instance = Staff()
     	staff_result = staff_instance.add_person(person_name, person_type, wants_accommodation)
+    	if(not isinstance(staff_result, list)):
+    		print(staff_result)
+    		return
     	self.created_persons.update({staff_result[0] : [staff_result[1], staff_result[2]]})
     	print(staff_result[1],staff_result[0],"has been successfully added.")
     	if(self.allocate_room(staff_result[0])  == 1):
     		allocation =  self.room_allocation[staff_result[0]]
     		print(staff_result[1], staff_result[0],"has been allocated", allocation, self.created_rooms[allocation])
+    	else:
+    		print("No rooms available for allocation")
 
     #function to create a file
     def dojo_create_file(self, filename, data = {}):
@@ -175,25 +196,19 @@ class Dojo (cmd.Cmd):
     	livingspace_max_occupants = LivingSpace().max_occupants
 
     	if(len(self.created_rooms) > 0):
-    		rooms_list = []
-    		for key, value in self.created_rooms.items():
-    			rooms_list.append(key)
-
-    		random_key = random.randint(0 , len(rooms_list) - 1)
-    		room_allocated = rooms_list[random_key]
-    		count = 1
-    		if(self.created_rooms):
+    		
+    		for room_name,room_type in self.created_rooms.items():
+    			count = 1
     			for key, value in self.room_allocation.items():
-    				if value == room_allocated:
+    				if value == room_name:
     					count += 1
-    			if(self.created_rooms[room_allocated] == "Office" and count <= office_max_occupants):
-    				self.room_allocation.update({person_name:room_allocated})
+
+    			if(room_type == "Office" and count <= office_max_occupants):
+    				self.room_allocation.update({person_name:room_name})
     				return 1
-    			elif(self.created_rooms[room_allocated] == "Livingspace" and count <= livingspace_max_occupants):
-    				self.room_allocation.update({person_name:room_allocated})
+    			elif(room_type == "Livingspace" and count <= livingspace_max_occupants):
+    				self.room_allocation.update({person_name:room_name})
     				return 1
-    			else:
-    				return 0
 
     #function to show specific room allocation
     def do_print_room(self, arg):
