@@ -16,7 +16,6 @@ class Dojo (cmd.Cmd):
 
     #function create an office
     def dojo_create_office(self, room_name, room_type):
-
     	
     	if(isinstance(room_name, list)):
     		if(self.created_rooms):
@@ -67,7 +66,7 @@ class Dojo (cmd.Cmd):
     	error = "Use alphabet (a-z) characters for the person name, type and wants accomodation"
 
     	if(not wants_accommodation):
-    		wants_accommodation = 'N'
+    		wants_accommodation = "N"
 
     	if(person_name in self.created_persons):
     		print(person_type, person_name, "Already exists!")
@@ -96,7 +95,7 @@ class Dojo (cmd.Cmd):
     	error = "Use alphabet (a-z) characters for the person name, type and wants accomodation"
 
     	if(not wants_accommodation):
-    		wants_accommodation = 'N'
+    		wants_accommodation = "N"
 
     	if(person_name in self.created_persons):
     		print(person_type, person_name, "Already exists!")
@@ -133,8 +132,15 @@ class Dojo (cmd.Cmd):
     			for key in data:
     				file_handler.write(' '.join([key, '\n']))
     		else:
+    			allocated = []
     			for key, value in data.items():
-    				file_handler.write(' '.join([key, value, '\n']))
+    				allocated.append(value)
+    			allocated = list(set(allocated))
+    			for allocation in allocated:
+    				file_handler.write(allocation)
+    				file_handler.write('\n=======================================\n')
+    				file_handler.write(','.join([name for name, room in data.items() if room == allocation]))
+    				file_handler.write('\n\n')
     		file_handler.close()
     		return "File {} created".format(filename)
 
