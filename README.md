@@ -2,11 +2,11 @@
 
 An interactive command line app to allocate rooms and living spaces to staff and fellows.
 
-#Installation / Getting Started
+# Installation / Getting Started
 
 - clone the repo and run app.py in the command line (python app.py).
 
-##dependencies
+## dependencies
 - python version 3.4 and above.
 - docopt version 0.6.2 and above.
 - virtualenv version 15.1.0 and above.
@@ -16,7 +16,7 @@ An interactive command line app to allocate rooms and living spaces to staff and
 - docopt http://docopt.org/
 - python https://docs.python.org/3/
 
-#Usage / Commands
+# Usage / Commands
 create_room room_type room_names - create rooms of type Office or Living space.
 add_person person_name FELLOW|STAFF  wants_accommodation(Y|N) - create staff or fellows.
 print_room room_name - Prints  the names of all the people in ​room_name​ on the  screen.
