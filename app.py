@@ -270,14 +270,11 @@ class Dojo (cmd.Cmd):
 	        		for key, value in self.office_allocation.items():
 	        			if value == arguments['<room_name>']:
 	        				print(key,'office',value)
-	        	else:
-	        		print("No rooms allocated")
+
 	        	if(len(self.living_allocation) != 0):
 	        		for key, value in self.living_allocation.items():
 	        			if value == arguments['<room_name>']:
 	        				print(key,'living space',value)
-	        	else:
-	        		print("No rooms allocated")
         			
 
     #function to show room allocations
@@ -351,7 +348,8 @@ class Dojo (cmd.Cmd):
     def dojo_reallocate_person(self, person_identifier, new_room_name):
 
     	full_name = ' '.join(person_identifier)
-
+    	
+    	
     	if(self.created_persons and full_name not in self.created_persons):
     		return "Person {} does not exist".format(full_name)
     	elif(self.created_rooms and new_room_name not in self.created_rooms):
@@ -365,12 +363,11 @@ class Dojo (cmd.Cmd):
 	    			if new_room_name == room_name:
 	    				count += 1
 	    		if(count <= office_max_occupants):
-	    			print(count,office_max_occupants)
 		    		reallocated = 1
 	    			self.office_allocation[full_name] = new_room_name
-	    			return "{} has been re-allocated to {}".format(new_room_name)
+	    			return "{} has been re-allocated to {}".format(full_name, new_room_name)
     			if(reallocated == 0):
-    				return"Room {} is full.".format(self.office_allocation[full_name])
+    				return"Room {} is full.".format(new_room_name)
     		
     		if(self.living_allocation[full_name]):
     			livingspace_max_occupants = LivingSpace().max_occupants
@@ -384,8 +381,7 @@ class Dojo (cmd.Cmd):
 	    			self.living_allocation[full_name] = new_room_name
 	    			return "{} has been re-allocated to {}".format(full_name, new_room_name)
     			if(reallocated == 0):
-    				return "Room {} is full.".format(new_room_name)
-    		
+    				return "Room {} is full.".format(new_room_name)    		
 
 
     #function to take variables to reallocate persons
