@@ -1,4 +1,4 @@
-# Adams-Kariuki-Dojo-Project
+Dojo Manager
 
 An interactive command line app to allocate rooms and living spaces to staff and fellows.
 
