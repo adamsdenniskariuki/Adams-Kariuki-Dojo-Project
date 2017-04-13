@@ -2,3 +2,4 @@
 .cache
 *.pyc
 unittest.txt
+test_app.py

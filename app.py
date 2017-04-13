@@ -464,11 +464,11 @@ class Dojo (cmd.Cmd):
 
     	else:
     		try:
-	        	path = r"E:/Dojo/v2/Adams-Kariuki-Dojo-Project/db/"
+	        	path = r""
 	        	if(arguments['DBNAME'] and arguments['DBNAME'].isalpha()):
 	        		path = ''.join([path, arguments['DBNAME']])
 	        	else:
-	        		path = r"E:/Dojo/v2/Adams-Kariuki-Dojo-Project/db/dojodb"
+	        		path = r"dojodb"
 	        	connection = sqlite3.connect(path)
 	        	db_cursor = connection.cursor()
 	        	db_cursor.execute('CREATE TABLE IF NOT EXISTS dojo_room (room_name text PRIMARY KEY, room_type text not null);')
@@ -515,9 +515,8 @@ class Dojo (cmd.Cmd):
 
     	else:
     		try:
-    			path = r'E:/Dojo/v2/Adams-Kariuki-Dojo-Project/db/dojodb'
     			if(arguments['<dojodb>'] and arguments['<dojodb>'].isalpha()):
-	    			path = ''.join(['E:/Dojo/v2/Adams-Kariuki-Dojo-Project/db/', arguments['<dojodb>']])
+	    			path = arguments['<dojodb>']
 		    		if(os.path.exists(path) == False):
 		    			print("database {} does not exist.".format(arguments['<dojodb>']))
 		    		else:
