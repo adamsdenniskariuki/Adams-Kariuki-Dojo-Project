@@ -299,11 +299,11 @@ class Dojo (cmd.Cmd):
     		found_allocation = 0
     		if(self.office_allocation):
     			for key, values in self.office_allocation.items():
-    				print(key, values)
+    				print(key, values, self.created_rooms[values])
     			found_allocation = 1
     		if(self.living_allocation):
     			for key, values in self.living_allocation.items():
-    				print(key, values)
+    				print(key, values, self.created_rooms[values])
     			found_allocation = 1
     		if(arguments['FILE'] and arguments['-o']):
     				print(self.dojo_create_file(arguments['FILE'], {'allocation':1}))
@@ -367,7 +367,7 @@ class Dojo (cmd.Cmd):
 	    			self.office_allocation[full_name] = new_room_name
 	    			return "{} has been re-allocated to {}".format(full_name, new_room_name)
     			if(reallocated == 0):
-    				return"Room {} is full.".format(new_room_name)
+    				return "Room {} is full.".format(new_room_name)
     		
     		if(self.living_allocation[full_name]):
     			livingspace_max_occupants = LivingSpace().max_occupants
