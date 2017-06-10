@@ -20,23 +20,23 @@ An interactive command line app to allocate rooms and living spaces to staff and
 
 # Usage / Commands
 
-	create_room room_type room_names : _create rooms of type Office or Living space._
+	create_room room_type room_names : *create rooms of type Office or Living space*.
 
-	add_person person_name FELLOW|STAFF  wants_accommodation(Y|N) : _create staff or fellows._
+	add_person person_name FELLOW|STAFF  wants_accommodation(Y|N) : *create staff or fellows*.
 
-	print_room room_name : _Prints  the names of all the people in ​room_name​ on the screen._
+	print_room room_name : *Prints the names of all the people in a ​room​ on the screen*.
 
-	print_allocations filename​ : _Prints a list of room allocations onto the screen or file specified._
+	print_allocations filename​ : *Prints a list of room allocations onto the screen or file specified*.
 
-	print_unallocated filename : _Prints a list of unallocated people to the screen or file specified._
+	print_unallocated filename : *Prints a list of unallocated people to the screen or file specified*.
 
-	reallocate_person person_name new_room_name​ : _Reallocate the person entered​ to ​a new room​._
+	reallocate_person person_name new_room_name​ : *Reallocate the person entered​ to ​a new room​*.
 
-	load_people​ : _Adds people to rooms from a txt file._
+	load_people​ : *Adds people to rooms from a txt file*.
 
-	save_state​ database_name : _Persists all the data stored in the app to an SQLite database._
+	save_state​ database_name : *Persists all the data stored in the app to an SQLite database*.
 
-	load_state database_name : _Loads data from a database into the application._
+	load_state database_name : *Loads data from a database into the application*.
 
 # Author
 Adams Kariuki Dennis @ 2017
