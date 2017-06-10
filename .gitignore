@@ -1,5 +1,9 @@
 /old
-.cache
+/.cache
+/__pycache__
+app.py.bak
+plugins
+*.DS_Store
 *.pyc
 unittest.txt
 test_app.py
