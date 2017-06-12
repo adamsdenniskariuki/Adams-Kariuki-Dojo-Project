@@ -1,5 +1,7 @@
 ![Build Status](https://travis-ci.org/adamsdenniskariuki/Adams-Kariuki-Dojo-Project.svg?branch=v0)
 
+[![Coverage Status](https://coveralls.io/repos/github/adamsdenniskariuki/Adams-Kariuki-Dojo-Project/badge.svg?branch=v0)](https://coveralls.io/github/adamsdenniskariuki/Adams-Kariuki-Dojo-Project?branch=v0)
+
 # Amity
 
 An interactive command line app to allocate rooms and living spaces to staff and fellows.
