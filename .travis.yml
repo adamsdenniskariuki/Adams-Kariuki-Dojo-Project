@@ -3,4 +3,7 @@ python:
   - "3.4"
 install: "pip install -r requirements.txt"
 # command to run tests
-script: pytest
+script: 
+  coverage run --source=model -m py.test
+after_success:
+  coveralls
