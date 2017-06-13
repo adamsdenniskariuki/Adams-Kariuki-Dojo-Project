@@ -1,4 +1,0 @@
-autopep8 --in-place --aggressive --aggressive app.py
-
-pep8ify -w app.py
-
