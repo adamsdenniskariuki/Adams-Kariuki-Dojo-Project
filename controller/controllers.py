@@ -444,6 +444,7 @@ class Controllers(object):
 	def print_room(self, room_name):
 		if(room_name not in self.all_rooms):
 			print("Room", room_name, "does not exist.")
+			return ("Room {} does not exist.".format(room_name))
 		else:
 			if(len(self.office_allocation) != 0):
 				for key, value in self.office_allocation.items():

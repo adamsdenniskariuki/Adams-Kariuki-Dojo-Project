@@ -1,0 +1,10 @@
+1. Staff who wants accommodation ought to be just created but not allocated a living space. DONE
+2. A person was not given a living space, but was not in the unallocated people list, ensure they are placed in the correct. DONE
+3. How about we get feedback for user actions -case here being save state command. DONE
+4. Configure coverage to only cover your python files and not lib packages, add more tests for functionalities written in app.py
+5. Review the naming conventions f or your functions in class dojo. DONE
+6. Avoid abbreviation in variable naming, also short forms -they reduce readability and may be misinterpreted. DONE
+7. Use cases for args and kwargs - DONE
+8. Consider having keys to be static and values dynamic, avoid state where you are forced to use dynamic values as keys. e.g {“shem”: [‘fellow’, ‘y’]
+9. Room class - has a method that does not make sense to have in it, and has variables that do no make sense to have - created_rooms and create_room method. DONE
+10. Check out the concept of ABC and ABCMeta and use it to alter class room and person.
