@@ -88,27 +88,27 @@ class Controllers(object):
 
 			fellow_instance = Fellow(person_name, person_type,
 													   wants_accommodation)
-			self.all_persons.update({fellow_instance.person_name:
-				[fellow_instance.person_type, fellow_instance.wants_accommodation]})
+			self.all_persons.update({fellow_instance.id:
+				[fellow_instance.person_name, fellow_instance.person_type, fellow_instance.wants_accommodation]})
 			print(fellow_instance.person_type, fellow_instance.person_name,
 				  "has been successfully added,")
 
-			if(self.allocate_office(fellow_instance.person_name) == 1):
-				officeallocation = self.office_allocation[fellow_instance.person_name]
+			if(self.allocate_office(fellow_instance.id) == 1):
+				officeallocation = self.office_allocation[fellow_instance.id]
 				print(fellow_instance.person_type, fellow_instance.person_name,
 					"has been allocated",
 					officeallocation, self.all_rooms[officeallocation])
 			else:
-				self.unallocated_persons.update({fellow_instance.person_name:"Office"})
+				self.unallocated_persons.update({fellow_instance.id:"Office"})
 				print("No offices available for allocation")
 
 			if(wants_accommodation == 'Y' and self.allocate_livingspace(
 					fellow_instance.person_name) == 1):
-				livingallocation = self.living_allocation[fellow_instance.person_name]
+				livingallocation = self.living_allocation[fellow_instance.id]
 				print(fellow_instance.person_type, fellow_instance.person_name, "has been allocated",
 					  livingallocation, self.all_rooms[livingallocation])
 			else:
-				self.unallocated_persons.update({fellow_instance.person_name:"LivingSpace"})
+				self.unallocated_persons.update({fellow_instance.id:"LivingSpace"})
 				print("No living spaces allocated")
 
 	# function to add a staff
@@ -131,19 +131,19 @@ class Controllers(object):
 
 			staff_instance = Staff(person_name, person_type,
 													 wants_accommodation)
-			self.all_persons.update({staff_instance.person_name:
-				[staff_instance.person_type, staff_instance.wants_accommodation]})
+			self.all_persons.update({staff_instance.id:
+				[staff_instance.person_name, staff_instance.person_type, staff_instance.wants_accommodation]})
 			print(staff_instance.person_type, staff_instance.person_name, "has been successfully added.")
 
 			if(wants_accommodation == "Y" or wants_accommodation == "y"):
 				print("Staff members are not allocated living quarters")
 
-			if(self.allocate_office(staff_instance.person_name) == 1):
-				allocation = self.office_allocation[staff_instance.person_name]
+			if(self.allocate_office(staff_instance.id) == 1):
+				allocation = self.office_allocation[staff_instance.id]
 				print(staff_instance.person_type, staff_instance.person_name, "has been allocated",
 					  allocation, self.all_rooms[allocation])
 			else:
-				self.unallocated_persons.update({staff_instance.person_name:"Office"})
+				self.unallocated_persons.update({staff_instance.id:"Office"})
 				print("No offices available for allocation")
 
 	# function to create a file
@@ -169,7 +169,7 @@ class Controllers(object):
 						file_handler.write(
 							'\n=======================================\n')
 						file_handler.write(','.join(
-							[name for name, room in
+							[self.all_persons[pid][0] for pid, room in
 								self.living_allocation.items()
 								if room == allocation]))
 						file_handler.write('\n\n')
@@ -182,7 +182,7 @@ class Controllers(object):
 						file_handler.write(
 							'\n=======================================\n')
 						file_handler.write(','.join(
-							[name for name, room in
+							[self.all_persons[pid][0] for pid, room in
 								self.office_allocation.items()
 								if room == allocation]))
 						file_handler.write('\n\n')
@@ -190,7 +190,7 @@ class Controllers(object):
 			return "File {} created".format(filename)
 
 	# function to allocate a room to a person
-	def allocate_office(self, person_name):
+	def allocate_office(self, person_id):
 		office_max_occupants = 6
 
 		if(len(self.all_rooms) > 0):
@@ -204,11 +204,11 @@ class Controllers(object):
 						count += 1
 
 				if(room_type == "Office" and count <= office_max_occupants):
-					self.office_allocation.update({person_name: room_name})
+					self.office_allocation.update({person_id: room_name})
 					return 1
 
 	# function to allocate a livingspace to a person
-	def allocate_livingspace(self, person_name):
+	def allocate_livingspace(self, person_id):
 		livingspace_max_occupants = 4
 
 		if(len(self.all_rooms) > 0):
@@ -223,7 +223,7 @@ class Controllers(object):
 
 				if(room_type == "Livingspace" and count <=
 						livingspace_max_occupants):
-					self.living_allocation.update({person_name: room_name})
+					self.living_allocation.update({person_id: room_name})
 					return 1
 
 	#save data to the database
@@ -243,17 +243,18 @@ class Controllers(object):
 						 'room_type text not null);']))
 			db_cursor.execute(
 				'CREATE TABLE IF NOT EXISTS dojo_person (' +
-				'person_name text PRIMARY KEY,' +
+				'pid integer PRIMARY KEY,' +
+				'person_name text not null,' +
 				'person_type text not null,' +
 				'wants_accomodation text not null);')
 			db_cursor.execute(
 				'CREATE TABLE IF NOT EXISTS dojo_allocation('
-				'person_name text not null,' +
+				'pid integer not null,' +
 				'room_name text not null,' +
 				'room_type text not null);')
 			db_cursor.execute(
 				'CREATE TABLE IF NOT EXISTS dojo_unallocated('
-				'person_name text not null,' +
+				'pid integer not null,' +
 				'room_type text not null);')
 			if(self.all_rooms):
 				for key, val in self.all_rooms.items():
@@ -266,23 +267,22 @@ class Controllers(object):
 				for key, val in self.all_persons.items():
 					db_cursor.execute(
 						"INSERT OR REPLACE INTO dojo_person" +
-						"(person_name, person_type, wants_accomodation)" +
-						"VALUES ('{v1}', '{v2}', '{v3}')"
+						"(pid, person_name, person_type, wants_accomodation)" +
+						"VALUES ('{v1}', '{v2}', '{v3}', '{v4}')"
 						.format(
-							v1=key, v2=val[0],
-							v3=val[1]))
+							v1=key, v2=val[0], v3=val[1], v4=val[2]))
 			if(self.office_allocation):
 				for key, val in self.office_allocation.items():
 					db_cursor.execute(
-						"UPDATE dojo_allocation SET room_name = '{v1}'" +
-						"WHERE person_name = '{v2}' AND room_type = '{v3}'"
+						"UPDATE dojo_allocation SET room_name = '"+val+"'" +
+						"WHERE pid = '{v2}' AND room_type = '{v3}'"
 						.format(
 							v1=val, v2=key,
 							v3=self.all_rooms[val]))
 					if(db_cursor.rowcount != 1):
 						db_cursor.execute(
 							"INSERT INTO dojo_allocation" +
-							"(person_name, room_name, room_type)" +
+							"(pid, room_name, room_type)" +
 							"VALUES ('{v1}', '{v2}', '{v3}')"
 							.format(
 								v1=key, v2=val,
@@ -290,29 +290,29 @@ class Controllers(object):
 			if(self.living_allocation):
 				for key, val in self.living_allocation.items():
 					db_cursor.execute(
-						"UPDATE dojo_allocation SET room_name = '{v1}'" +
-						"WHERE person_name = '{v2}' AND room_type = '{v3}'"
+						"UPDATE dojo_allocation SET room_name = '"+val+"'" +
+						"WHERE pid = '{v2}' AND room_type = '{v3}'"
 						.format(
 							v1=val, v2=key,
 							v3=self.all_rooms[val]))
 					if(db_cursor.rowcount != 1):
 						db_cursor.execute(
 							"INSERT INTO dojo_allocation " +
-							"(person_name, room_name, room_type)" +
+							"(pid, room_name, room_type)" +
 							"VALUES ('{v1}', '{v2}', '{v3}')" .format(
 								v1=key, v2=val,
 								v3=self.all_rooms[val]))
 			if(self.unallocated_persons):
 				for key, val in self.unallocated_persons.items():
 					db_cursor.execute(
-						"UPDATE dojo_unallocated SET person_name = '{v1}', room_type = '{v2}'" +
-						"WHERE person_name = '{v1}' AND room_type = '{v2}'"
+						"UPDATE dojo_unallocated SET pid = '"+str(key)+"', room_type = '"+val+"'" +
+						"WHERE pid = '{v1}' AND room_type = '{v2}'"
 						.format(
 							v1=key, v2=val))
 					if(db_cursor.rowcount != 1):
 						db_cursor.execute(
 							"INSERT INTO dojo_unallocated " +
-							"(person_name, room_type)" +
+							"(pid, room_type)" +
 							"VALUES ('{v1}', '{v2}')" .format(
 								v1=key, v2=val))
 			connection.commit()
@@ -336,7 +336,7 @@ class Controllers(object):
 					db_cursor.execute('SELECT * FROM dojo_person')
 					for room_data in db_cursor.fetchall():
 						self.all_persons.update({room_data[0]: [
-							room_data[1], room_data[2]]})
+							room_data[1], room_data[2], room_data[3]]})
 					db_cursor.execute('SELECT * FROM dojo_room')
 					for room_data in db_cursor.fetchall():
 						self.all_rooms.update({room_data[0]: room_data
@@ -367,37 +367,42 @@ class Controllers(object):
 		if(self.office_allocation):
 
 			full_name = ' '.join(person_identifier)
+			pid = 0
+			for key, value in self.all_persons.items():
+				if(full_name == value[0]):
+					pid = key
 
-			if(self.all_persons and full_name not in self.all_persons):
+			if(self.all_persons and pid not in self.all_persons):
 				print("Person {} does not exist".format(full_name))
 			elif(self.all_rooms and new_room_name not in self.all_rooms):
 				print("Room {} does not exist".format(new_room_name))
 			else:
-				if(full_name in self.office_allocation):
+
+				if(pid in self.office_allocation):
 					office_max_occupants = 6
 					count = 1
 					reallocated = 0
-					for person_name, room_name in self.office_allocation.items():
+					for person_id, room_name in self.office_allocation.items():
 						if new_room_name == room_name:
 							count += 1
 					if(count <= office_max_occupants):
 						reallocated = 1
-						self.office_allocation[full_name] = new_room_name
+						self.office_allocation[pid] = new_room_name
 						print("{} has been re-allocated to {}".format(
 							full_name, new_room_name))
 					if(reallocated == 0):
 						print("Room {} is full.".format(new_room_name))
 
-				if(full_name in self.living_allocation):
+				if(pid in self.living_allocation):
 					livingspace_max_occupants = 4
 					count = 1
 					reallocated = 0
-					for person_name, room_name in self.living_allocation.items():
+					for person_id, room_name in self.living_allocation.items():
 						if new_room_name == room_name:
 							count += 1
 					if(count <= livingspace_max_occupants):
 						reallocated = 1
-						self.living_allocation[full_name] = new_room_name
+						self.living_allocation[pid] = new_room_name
 						print("{} has been re-allocated to {}".format(
 							full_name, new_room_name))
 					if(reallocated == 0):
@@ -412,9 +417,9 @@ class Controllers(object):
 		if(self.all_persons):
 			if(self.unallocated_persons):
 				for key, value in self.unallocated_persons.items():
-					print(key, value)
+					print(self.all_persons[key][0], value)
 
-					all_unallocated.append(' - '.join([key, value]))
+					all_unallocated.append(' - '.join([self.all_persons[key][0], value]))
 				if(file_name != "-1"):
 					print(self.create_file(file_name, all_unallocated
 												))
@@ -428,11 +433,11 @@ class Controllers(object):
 		found_allocation = 0
 		if(self.office_allocation):
 			for key, values in self.office_allocation.items():
-				print(key, values, self.all_rooms[values])
+				print(self.all_persons[key][0], values, self.all_rooms[values])
 			found_allocation = 1
 		if(self.living_allocation):
 			for key, values in self.living_allocation.items():
-				print(key, values, self.all_rooms[values])
+				print(self.all_persons[key][0], values, self.all_rooms[values])
 			found_allocation = 1
 		if(file_name != "-1"):
 			print(self.create_file(file_name, {'allocation':
@@ -449,12 +454,12 @@ class Controllers(object):
 			if(len(self.office_allocation) != 0):
 				for key, value in self.office_allocation.items():
 					if value == room_name:
-						print(key, 'office', value)
+						print(self.all_persons[key][0], 'office', value)
 
 			if(len(self.living_allocation) != 0):
 				for key, value in self.living_allocation.items():
 					if value == room_name:
-						print(key, 'living space', value)
+						print(self.all_persons[key][0], 'living space', value)
 
 	#function to load persons from a text file
 	def load_people(self):
@@ -478,11 +483,3 @@ class Controllers(object):
 				else:
 					self.add_staff(full_name, person_type,
 										wants_accommodation)
-
-	#function to generate random numbers for the id
-	def generate_id(self):
-
-		generated_id = []
-		for number in range(8):
-			generated_id.append(str(random.randint(1,11)))
-		return int(''.join(generated_id))

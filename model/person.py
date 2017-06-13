@@ -7,6 +7,7 @@ class Person(object):
         self.person_name = person_name
         self.person_type = person_type
         self.wants_accommodation = wants_accommodation
+        self.id = id(person_name)
 
 
 #class to create staff
