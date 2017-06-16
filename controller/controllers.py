@@ -5,6 +5,9 @@ import random
 import sqlite3
 from model.person import Person, Staff, Fellow
 from model.room import Room, Office, LivingSpace
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from model.orm_model import Rooms, Persons, Allocations, Unallocated, Base
 
 
 # class to hold all the controllers
@@ -225,6 +228,85 @@ class Controllers(object):
 						livingspace_max_occupants):
 					self.living_allocation.update({person_id: room_name})
 					return 1
+
+	#save state orm
+	def save_state_orm(self, db_name="dojo"):
+
+		db_name = db_name + ".db"
+		engine = create_engine('sqlite:///db/{}'.format(db_name))
+		#engine = create_engine('postgres://postgres:healthcheck17@localhost/dojo')
+		Base.metadata.create_all(engine)
+		DBSession = sessionmaker(bind=engine)
+		session = DBSession()
+
+		if(self.all_persons):
+			for key, val in self.all_persons.items():
+				new_person = Persons(key, val[0], val[1], val[2])
+				session.merge(new_person)
+				session.commit()
+
+		if(self.all_rooms):
+				for key, val in self.all_rooms.items():
+					new_room = Rooms(key, val)
+					session.merge(new_room)
+					session.commit()
+
+		if(self.office_allocation):
+				for key, val in self.office_allocation.items():
+					new_office_allocation = Allocations(key, val, self.all_rooms[val])
+					session.merge(new_office_allocation)
+					session.commit()
+
+		if(self.living_allocation):
+				for key, val in self.living_allocation.items():
+					new_living_allocation = Allocations(key, val, self.all_rooms[val])
+					session.merge(new_living_allocation)
+					session.commit()
+
+		if(self.unallocated_persons):
+				for key, val in self.unallocated_persons.items():
+					new_unallocated_person = Unallocated(key, val)
+					session.merge(new_unallocated_person)
+					session.commit()
+
+		print('All data saved...')
+
+	#load state of db using orm
+	def load_state_orm(self, db_name="dojo"):
+
+		db_name += ".db"
+		engine = create_engine('sqlite:///db/{}'.format(db_name))
+		#engine = create_engine('postgres://postgres:healthcheck17@localhost/dojo')
+		Base.metadata.create_all(engine)
+		DBSession = sessionmaker(bind=engine)
+		session = DBSession()
+
+		stored_persons = session.query(Persons).all()
+		stored_rooms = session.query(Rooms).all()
+		stored_allocations = session.query(Allocations).all()
+		stored_unallocated = session.query(Unallocated).all()
+
+		if stored_persons:
+			for person_object in stored_persons:
+				self.all_persons.update({person_object.pid: [
+							person_object.person_name, person_object.person_type, person_object.wants_accomodation]})
+
+		if stored_rooms:
+			for room_object in stored_rooms:
+				self.all_rooms.update({room_object.room_name: room_object.room_type})
+
+		if stored_unallocated:
+			for unallocated_object in stored_unallocated:
+				self.unallocated_persons.update({unallocated_object.pid: unallocated_object.room_type})
+
+		if stored_allocations:
+			for room_object in stored_allocations:
+				if(room_object.room_type == 'Office'):
+					self.office_allocation.update({room_object.pid:room_object.room_name})
+				else:
+					self.living_allocation.update({room_object.pid:room_object.room_name})
+
+		print("Data loaded...")
 
 	#save data to the database
 	def save_state(self, db_name):

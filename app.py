@@ -30,7 +30,7 @@ def get_docopt_inputs(func):
 
 # class to make the app interactive
 class Dojo (cmd.Cmd):
-	
+
 	intro = ''.join(['\nWelcome to the Amity program!\n\n',
 					'Type help for assistance and exit to leave.'])
 	prompt = '\nAmity >>>'
@@ -88,7 +88,7 @@ class Dojo (cmd.Cmd):
 		Usage:
 			print_room <room_name>
 		"""
-		
+
 		self.interface.print_room(arg['<room_name>'])
 
 	# function to show room allocations
@@ -147,7 +147,11 @@ class Dojo (cmd.Cmd):
 			save_state [-db DBNAME]
 		"""
 
-		self.interface.save_state(arg['DBNAME'])
+		if not arg['DBNAME']:
+			arg['DBNAME'] = "dojo"
+
+		#self.interface.save_state(arg['DBNAME'])
+		self.interface.save_state_orm(arg['DBNAME'])
 
 	# function to load state from db
 	@get_docopt_inputs
@@ -157,7 +161,11 @@ class Dojo (cmd.Cmd):
 			load_state [<dojodb>]
 		"""
 
-		self.interface.load_state(arg['<dojodb>'])
+		if not arg['<dojodb>']:
+			arg['<dojodb>'] = "dojo"
+
+		#self.interface.load_state(arg['<dojodb>'])
+		self.interface.load_state_orm(arg['<dojodb>'])
 
 	# function to exit when 'exit' is typed
 	def do_exit(self, arg):
