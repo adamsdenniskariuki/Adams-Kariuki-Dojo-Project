@@ -229,15 +229,20 @@ class Controllers(object):
 					self.living_allocation.update({person_id: room_name})
 					return 1
 
-	#save state orm
-	def save_state_orm(self, db_name="dojo"):
+	#function to create the db
+	def create_db(self, db_name):
 
 		db_name = db_name + ".db"
 		engine = create_engine('sqlite:///db/{}'.format(db_name))
 		#engine = create_engine('postgres://postgres:healthcheck17@localhost/dojo')
 		Base.metadata.create_all(engine)
 		DBSession = sessionmaker(bind=engine)
-		session = DBSession()
+		return DBSession()
+
+	#save state orm
+	def save_state_orm(self, db_name="dojo"):
+
+		session = self.create_db(db_name)
 
 		if(self.all_persons):
 			for key, val in self.all_persons.items():
@@ -274,12 +279,7 @@ class Controllers(object):
 	#load state of db using orm
 	def load_state_orm(self, db_name="dojo"):
 
-		db_name += ".db"
-		engine = create_engine('sqlite:///db/{}'.format(db_name))
-		#engine = create_engine('postgres://postgres:healthcheck17@localhost/dojo')
-		Base.metadata.create_all(engine)
-		DBSession = sessionmaker(bind=engine)
-		session = DBSession()
+		session = self.create_db(db_name)
 
 		stored_persons = session.query(Persons).all()
 		stored_rooms = session.query(Rooms).all()
