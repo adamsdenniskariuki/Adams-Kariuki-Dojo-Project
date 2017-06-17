@@ -1,10 +1,9 @@
 import os
 import random
-import sqlite3
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from model.person import Person, Staff, Fellow
-from model.room import Room, Office, LivingSpace
+from model.person import Staff, Fellow
+from model.room import Office, LivingSpace
 from model.orm_model import Rooms, Persons, Allocations, Unallocated, Base
 
 
@@ -21,7 +20,6 @@ class Interface(object):
 	def create_office(self, room_name, room_type):
 		
 		input_error = 0
-			
 		for room in room_name:
 			
 			if(room in self.all_rooms):
@@ -32,8 +30,8 @@ class Interface(object):
 				print(
 					"Use a-z only for the room name and room type"
 				)
-				return "Use a-z only for the room name and room type"
 				input_error = 1
+				return "Use a-z only for the room name and room type"
 
 		if(input_error == 0):
 			office_instance = Office(room_name, room_type)
@@ -56,8 +54,8 @@ class Interface(object):
 			
 			if(not room.isalpha()):
 				print(error)
-				return error
-				input_error = 1		
+				input_error = 1
+				return error		
 
 		if(input_error == 0):
 			livingspace_instance = LivingSpace(room_name, room_type)
@@ -144,7 +142,7 @@ class Interface(object):
 				print("No offices available for allocation")
 
 	# function to create a file
-	def create_file(self, filename, data={}):
+	def create_file(self, filename, data):
 
 		if(not filename.isalpha()):
 			return "Use a-z only for the file name"
@@ -224,7 +222,7 @@ class Interface(object):
 					return 1
 
 	#function to create the db
-	def create_db(self, db_name):
+	def create_db(db_name):
 
 		engine = create_engine('sqlite:///{}'.format(db_name))
 		#engine = create_engine('postgres://postgres:healthcheck17@localhost/dojo')

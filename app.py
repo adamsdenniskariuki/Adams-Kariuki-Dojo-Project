@@ -164,11 +164,8 @@ class Dojo (cmd.Cmd):
 	def do_exit(self, arg):
 		"""Quits out of Interactive Mode."""
 
-		print('Good Bye!')
+		print(self.prompt, 'Good Bye!')
 		return True
-
-	def do_cls(self, arg):
-		os.system('clear')
 
 
 # execute main code block

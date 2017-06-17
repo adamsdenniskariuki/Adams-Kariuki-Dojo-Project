@@ -6,11 +6,11 @@ class TestStaffClass(unittest.TestCase):
 
 	#test instance of staff
 	def test_add_staff_instance(self):
-		self.assertTrue(Staff("Madge Wanjiru", "Staff", "N"), Staff)
+		self.assertTrue(Staff("Madge Wanjiru"), Staff)
 
 	#test instance of fellow
 	def test_add_fellow_instance(self):
-		self.assertTrue(Fellow("Sam John", "Fellow", "Y"), Fellow)
+		self.assertTrue(Fellow("Sam John", "Y"), Fellow)
 
 
 if __name__ == '__main__':
