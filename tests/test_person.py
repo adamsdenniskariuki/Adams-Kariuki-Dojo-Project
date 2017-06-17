@@ -4,13 +4,17 @@ from model.person import Staff, Fellow
 #class to test the Staff class
 class TestStaffClass(unittest.TestCase):
 
+	def setUp(self):
+		self.staff = Staff("Madge Wanjiru")
+		self.fellow = Fellow("Sam John", "Y")
+
 	#test instance of staff
 	def test_add_staff_instance(self):
-		self.assertTrue(Staff("Madge Wanjiru"), Staff)
+		self.assertTrue(self.staff.person_type, "Staff")
 
 	#test instance of fellow
 	def test_add_fellow_instance(self):
-		self.assertTrue(Fellow("Sam John", "Y"), Fellow)
+		self.assertTrue(self.fellow, "Fellow")
 
 
 if __name__ == '__main__':
