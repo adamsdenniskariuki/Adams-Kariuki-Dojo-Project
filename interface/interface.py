@@ -427,8 +427,6 @@ class Interface(object):
 				else:
 					wants_accommodation = 'N'
 				if(person_type == "FELLOW"):
-					self.add_fellow(full_name, person_type,
-										 wants_accommodation)
+					self.add_fellow(full_name, wants_accommodation)
 				else:
-					self.add_staff(full_name, person_type,
-										wants_accommodation)
+					self.add_staff(full_name)
