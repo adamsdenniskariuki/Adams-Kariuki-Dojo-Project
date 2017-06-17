@@ -1,9 +1,6 @@
-
-
 import cmd
-from controller.controllers import Controllers
+from interface.interface import Interface
 from docopt import docopt, DocoptExit
-
 
 #function to get the inputs from docopt
 def get_docopt_inputs(func):
@@ -34,7 +31,7 @@ class Dojo (cmd.Cmd):
 	intro = ''.join(['\nWelcome to the Amity program!\n\n',
 					'Type help for assistance and exit to leave.'])
 	prompt = '\nAmity >>>'
-	interface = Controllers()
+	interface = Interface()
 
 	# function to get inputs to create a room
 	@get_docopt_inputs
@@ -150,7 +147,6 @@ class Dojo (cmd.Cmd):
 		if not arg['DBNAME']:
 			arg['DBNAME'] = "dojo"
 
-		#self.interface.save_state(arg['DBNAME'])
 		self.interface.save_state_orm(arg['DBNAME'])
 
 	# function to load state from db
@@ -164,7 +160,6 @@ class Dojo (cmd.Cmd):
 		if not arg['<dojodb>']:
 			arg['<dojodb>'] = "dojo"
 
-		#self.interface.load_state(arg['<dojodb>'])
 		self.interface.load_state_orm(arg['<dojodb>'])
 
 	# function to exit when 'exit' is typed

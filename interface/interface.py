@@ -1,17 +1,15 @@
-
-
 import os
 import random
 import sqlite3
-from model.person import Person, Staff, Fellow
-from model.room import Room, Office, LivingSpace
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from model.person import Person, Staff, Fellow
+from model.room import Room, Office, LivingSpace
 from model.orm_model import Rooms, Persons, Allocations, Unallocated, Base
 
 
 # class to hold all the controllers
-class Controllers(object):
+class Interface(object):
 
 	all_rooms = {}
 	all_persons = {}
@@ -132,8 +130,7 @@ class Controllers(object):
 
 		if(add_error == 0):
 
-			staff_instance = Staff(person_name, person_type,
-													 wants_accommodation)
+			staff_instance = Staff(person_name, person_type)
 			self.all_persons.update({staff_instance.id:
 				[staff_instance.person_name, staff_instance.person_type, staff_instance.wants_accommodation]})
 			print(staff_instance.person_type, staff_instance.person_name, "has been successfully added.")
@@ -232,8 +229,7 @@ class Controllers(object):
 	#function to create the db
 	def create_db(self, db_name):
 
-		db_name = db_name + ".db"
-		engine = create_engine('sqlite:///db/{}'.format(db_name))
+		engine = create_engine('sqlite:///{}'.format(db_name))
 		#engine = create_engine('postgres://postgres:healthcheck17@localhost/dojo')
 		Base.metadata.create_all(engine)
 		DBSession = sessionmaker(bind=engine)
@@ -241,207 +237,80 @@ class Controllers(object):
 
 	#save state orm
 	def save_state_orm(self, db_name="dojo"):
+		
+		if(not db_name.isalpha()):
+			print("Use a-z for the database name")
+		else:
+			db_name = "db/" + db_name + ".db"
+			session = self.create_db(db_name)
 
-		session = self.create_db(db_name)
-
-		if(self.all_persons):
-			for key, val in self.all_persons.items():
-				new_person = Persons(key, val[0], val[1], val[2])
-				session.merge(new_person)
-				session.commit()
-
-		if(self.all_rooms):
-				for key, val in self.all_rooms.items():
-					new_room = Rooms(key, val)
-					session.merge(new_room)
+			if(self.all_persons):
+				for key, val in self.all_persons.items():
+					new_person = Persons(key, val[0], val[1], val[2])
+					session.merge(new_person)
 					session.commit()
 
-		if(self.office_allocation):
-				for key, val in self.office_allocation.items():
-					new_office_allocation = Allocations(key, val, self.all_rooms[val])
-					session.merge(new_office_allocation)
-					session.commit()
+			if(self.all_rooms):
+					for key, val in self.all_rooms.items():
+						new_room = Rooms(key, val)
+						session.merge(new_room)
+						session.commit()
 
-		if(self.living_allocation):
-				for key, val in self.living_allocation.items():
-					new_living_allocation = Allocations(key, val, self.all_rooms[val])
-					session.merge(new_living_allocation)
-					session.commit()
+			if(self.office_allocation):
+					for key, val in self.office_allocation.items():
+						new_office_allocation = Allocations(key, val, self.all_rooms[val])
+						session.merge(new_office_allocation)
+						session.commit()
 
-		if(self.unallocated_persons):
-				for key, val in self.unallocated_persons.items():
-					new_unallocated_person = Unallocated(key, val)
-					session.merge(new_unallocated_person)
-					session.commit()
+			if(self.living_allocation):
+					for key, val in self.living_allocation.items():
+						new_living_allocation = Allocations(key, val, self.all_rooms[val])
+						session.merge(new_living_allocation)
+						session.commit()
 
-		print('All data saved...')
+			if(self.unallocated_persons):
+					for key, val in self.unallocated_persons.items():
+						new_unallocated_person = Unallocated(key, val)
+						session.merge(new_unallocated_person)
+						session.commit()
+
+			print('All data saved...')
 
 	#load state of db using orm
 	def load_state_orm(self, db_name="dojo"):
 
-		session = self.create_db(db_name)
+		db_name = "db/" + db_name + ".db"
+		
+		if(os.path.exists(db_name) is False):
+			print("database {} does not exist.".format(db_name))
+		else:
+			session = self.create_db(db_name)
+			stored_persons = session.query(Persons).all()
+			stored_rooms = session.query(Rooms).all()
+			stored_allocations = session.query(Allocations).all()
+			stored_unallocated = session.query(Unallocated).all()
 
-		stored_persons = session.query(Persons).all()
-		stored_rooms = session.query(Rooms).all()
-		stored_allocations = session.query(Allocations).all()
-		stored_unallocated = session.query(Unallocated).all()
+			if stored_persons:
+				for person_object in stored_persons:
+					self.all_persons.update({person_object.pid: [
+								person_object.person_name, person_object.person_type, person_object.wants_accomodation]})
 
-		if stored_persons:
-			for person_object in stored_persons:
-				self.all_persons.update({person_object.pid: [
-							person_object.person_name, person_object.person_type, person_object.wants_accomodation]})
+			if stored_rooms:
+				for room_object in stored_rooms:
+					self.all_rooms.update({room_object.room_name: room_object.room_type})
 
-		if stored_rooms:
-			for room_object in stored_rooms:
-				self.all_rooms.update({room_object.room_name: room_object.room_type})
+			if stored_unallocated:
+				for unallocated_object in stored_unallocated:
+					self.unallocated_persons.update({unallocated_object.pid: unallocated_object.room_type})
 
-		if stored_unallocated:
-			for unallocated_object in stored_unallocated:
-				self.unallocated_persons.update({unallocated_object.pid: unallocated_object.room_type})
+			if stored_allocations:
+				for room_object in stored_allocations:
+					if(room_object.room_type == 'Office'):
+						self.office_allocation.update({room_object.pid:room_object.room_name})
+					else:
+						self.living_allocation.update({room_object.pid:room_object.room_name})
 
-		if stored_allocations:
-			for room_object in stored_allocations:
-				if(room_object.room_type == 'Office'):
-					self.office_allocation.update({room_object.pid:room_object.room_name})
-				else:
-					self.living_allocation.update({room_object.pid:room_object.room_name})
-
-		print("Data loaded...")
-
-	#save data to the database
-	def save_state(self, db_name):
-
-		try:
-			path = r"./db/"
-			if(db_name and db_name.isalpha()):
-				path = ''.join([path, db_name])
-			else:
-				path = r"./db/dojodb"
-			connection = sqlite3.connect(path)
-			db_cursor = connection.cursor()
-			db_cursor.execute(
-				''.join(['CREATE TABLE IF NOT EXISTS dojo_room (',
-						'room_name text PRIMARY KEY,' +
-						 'room_type text not null);']))
-			db_cursor.execute(
-				'CREATE TABLE IF NOT EXISTS dojo_person (' +
-				'pid integer PRIMARY KEY,' +
-				'person_name text not null,' +
-				'person_type text not null,' +
-				'wants_accomodation text not null);')
-			db_cursor.execute(
-				'CREATE TABLE IF NOT EXISTS dojo_allocation('
-				'pid integer not null,' +
-				'room_name text not null,' +
-				'room_type text not null);')
-			db_cursor.execute(
-				'CREATE TABLE IF NOT EXISTS dojo_unallocated('
-				'pid integer not null,' +
-				'room_type text not null);')
-			if(self.all_rooms):
-				for key, val in self.all_rooms.items():
-					db_cursor.execute(
-						"INSERT OR REPLACE INTO dojo_room" +
-						"(room_name, room_type)" +
-						"VALUES ('{v1}', '{v2}')" .format(
-							v1=key, v2=val))
-			if(self.all_persons):
-				for key, val in self.all_persons.items():
-					db_cursor.execute(
-						"INSERT OR REPLACE INTO dojo_person" +
-						"(pid, person_name, person_type, wants_accomodation)" +
-						"VALUES ('{v1}', '{v2}', '{v3}', '{v4}')"
-						.format(
-							v1=key, v2=val[0], v3=val[1], v4=val[2]))
-			if(self.office_allocation):
-				for key, val in self.office_allocation.items():
-					db_cursor.execute(
-						"UPDATE dojo_allocation SET room_name = '"+val+"'" +
-						"WHERE pid = '{v2}' AND room_type = '{v3}'"
-						.format(
-							v1=val, v2=key,
-							v3=self.all_rooms[val]))
-					if(db_cursor.rowcount != 1):
-						db_cursor.execute(
-							"INSERT INTO dojo_allocation" +
-							"(pid, room_name, room_type)" +
-							"VALUES ('{v1}', '{v2}', '{v3}')"
-							.format(
-								v1=key, v2=val,
-								v3=self.all_rooms[val]))
-			if(self.living_allocation):
-				for key, val in self.living_allocation.items():
-					db_cursor.execute(
-						"UPDATE dojo_allocation SET room_name = '"+val+"'" +
-						"WHERE pid = '{v2}' AND room_type = '{v3}'"
-						.format(
-							v1=val, v2=key,
-							v3=self.all_rooms[val]))
-					if(db_cursor.rowcount != 1):
-						db_cursor.execute(
-							"INSERT INTO dojo_allocation " +
-							"(pid, room_name, room_type)" +
-							"VALUES ('{v1}', '{v2}', '{v3}')" .format(
-								v1=key, v2=val,
-								v3=self.all_rooms[val]))
-			if(self.unallocated_persons):
-				for key, val in self.unallocated_persons.items():
-					db_cursor.execute(
-						"UPDATE dojo_unallocated SET pid = '"+str(key)+"', room_type = '"+val+"'" +
-						"WHERE pid = '{v1}' AND room_type = '{v2}'"
-						.format(
-							v1=key, v2=val))
-					if(db_cursor.rowcount != 1):
-						db_cursor.execute(
-							"INSERT INTO dojo_unallocated " +
-							"(pid, room_type)" +
-							"VALUES ('{v1}', '{v2}')" .format(
-								v1=key, v2=val))
-			connection.commit()
-			connection.close()
-			print('All data saved...')
-		except Exception as e:
-			print('Error:', e)
-
-	#function to load state from the database
-	def load_state(self, db_name):
-
-		try:
-			if(db_name and db_name.isalpha()):
-				path = ''.join(['./db/', db_name])
-				if(os.path.exists(path) is False):
-					print("database {} does not exist.".format(arguments[
-						'<dojodb>']))
-				else:
-					connection = sqlite3.connect(path)
-					db_cursor = connection.cursor()
-					db_cursor.execute('SELECT * FROM dojo_person')
-					for room_data in db_cursor.fetchall():
-						self.all_persons.update({room_data[0]: [
-							room_data[1], room_data[2], room_data[3]]})
-					db_cursor.execute('SELECT * FROM dojo_room')
-					for room_data in db_cursor.fetchall():
-						self.all_rooms.update({room_data[0]: room_data
-												   [1]})
-					db_cursor.execute('SELECT * FROM dojo_allocation')
-					for room_data in db_cursor.fetchall():
-						if(self.all_rooms[room_data[1]] == 'Office'):
-							self.office_allocation.update({room_data[0]:
-														   room_data[1]})
-						else:
-							self.living_allocation.update({room_data[0]:
-														   room_data[1]})
-					db_cursor.execute('SELECT * FROM dojo_unallocated')
-					for unalloc_data in db_cursor.fetchall():
-						self.unallocated_persons.update({unalloc_data[0]: unalloc_data
-												   [1]})
-					connection.close()
-					print("Data loaded...")
-			else:
-				print(
-					"Use alphabet (a-z) characters for the database name")
-		except Exception as e:
-			print('Error:', e)
+			print("Data loaded...")
 
 	# function to reallocate persons
 	def reallocate_person(self, person_identifier, new_room_name):
@@ -512,6 +381,7 @@ class Controllers(object):
 
 	#function to print allocations
 	def print_allocations(self, file_name="-1"):
+
 		found_allocation = 0
 		if(self.office_allocation):
 			for key, values in self.office_allocation.items():

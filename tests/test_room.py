@@ -9,8 +9,8 @@ class TestRoomClass(unittest.TestCase):
 		self.assertTrue(Office(["Yellow"], "Office"), Office)
 
 	#test instance of living room
-	def test_create_office_instance(self):
-		self.assertTrue(Office(["White"], "Livingspace"), LivingSpace)
+	def test_create_livingspace_instance(self):
+		self.assertTrue(LivingSpace(["White"], "Livingspace"), LivingSpace)
 
 	#test office max occupants
 	def test_office_max_occupants(self):
