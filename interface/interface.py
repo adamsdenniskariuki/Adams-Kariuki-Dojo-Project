@@ -67,7 +67,7 @@ class Interface(object):
 					  format(livingspace))
 
 	# function to add a fellow
-	def add_fellow(self, person_name, wants_accommodation):
+	def add_fellow(self, person_name, wants_accommodation='N'):
 
 		add_error = 0
 		error = "Use a-z only for the person name, type and wants accomodation"
@@ -102,7 +102,7 @@ class Interface(object):
 				print("No offices available for allocation")
 
 			if(wants_accommodation == 'Y' and self.allocate_livingspace(
-					fellow_instance.person_name) == 1):
+					fellow_instance.id) == 1):
 				livingallocation = self.living_allocation[fellow_instance.id]
 				print(fellow_instance.person_type, fellow_instance.person_name, "has been allocated",
 					  livingallocation, self.all_rooms[livingallocation])

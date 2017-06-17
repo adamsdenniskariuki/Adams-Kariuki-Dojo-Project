@@ -57,20 +57,20 @@ class Dojo (cmd.Cmd):
 	def do_add_person(self, arg):
 		"""
 		Usage:
-			add_person (<person_name> <person_name>) (Fellow|Staff)
+			add_person (<person_name> <person_name>) (fellow|staff)
 				[<wants_accommodation>]
 		"""
 
 		if(arg['<wants_accommodation>'] is None):
 			arg['<wants_accommodation>'] = "N"
 
-		if(arg['Fellow']):
+		if(arg['fellow']):
 			self.interface.add_fellow(
 				" ".join(
 					arg['<person_name>']),
 				arg['<wants_accommodation>'])
 
-		if(arg['Staff']):
+		if(arg['staff']):
 			self.interface.add_staff(
 				" ".join(
 					arg['<person_name>']),
