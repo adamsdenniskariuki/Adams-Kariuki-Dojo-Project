@@ -1,4 +1,4 @@
-![Build Status](https://travis-ci.org/adamsdenniskariuki/Adams-Kariuki-Dojo-Project.svg?branch=v0) [![Coverage Status](https://coveralls.io/repos/github/adamsdenniskariuki/Adams-Kariuki-Dojo-Project/badge.svg?branch=v0)](https://coveralls.io/github/adamsdenniskariuki/Adams-Kariuki-Dojo-Project?branch=v0)
+![Build Status](https://travis-ci.org/adamsdenniskariuki/Adams-Kariuki-Dojo-Project.svg?branch=v0) [![Coverage Status](https://coveralls.io/repos/github/adamsdenniskariuki/Adams-Kariuki-Dojo-Project/badge.svg?branch=v0)](https://coveralls.io/github/adamsdenniskariuki/Adams-Kariuki-Dojo-Project?branch=v0) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d79a0cacb362488792f2038147d08016)](https://www.codacy.com/app/adamsdenniskariuki/Adams-Kariuki-Dojo-Project?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=adamsdenniskariuki/Adams-Kariuki-Dojo-Project&amp;utm_campaign=Badge_Grade)
 
 # Amity
 
