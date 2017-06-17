@@ -1,9 +1,5 @@
-/old
-/.cache
-/__pycache__
-app.py.bak
-plugins
-*.DS_Store
+__pycache__/
 *.pyc
-unittest.txt
-test_app.py
+.DS_Store
+.coverage
+*.db

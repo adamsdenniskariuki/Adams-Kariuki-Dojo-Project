@@ -1,6 +1,6 @@
 import cmd
-from interface.interface import Interface
 from docopt import docopt, DocoptExit
+from interface.interface import Interface
 
 #function to get the inputs from docopt
 def get_docopt_inputs(func):
@@ -68,14 +68,12 @@ class Dojo (cmd.Cmd):
 			self.interface.add_fellow(
 				" ".join(
 					arg['<person_name>']),
-				'Fellow',
 				arg['<wants_accommodation>'])
 
 		if(arg['Staff']):
 			self.interface.add_staff(
 				" ".join(
 					arg['<person_name>']),
-				'Staff',
 				arg['<wants_accommodation>'])
 
 	# function to show specific room allocation

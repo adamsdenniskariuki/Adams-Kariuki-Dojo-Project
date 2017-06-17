@@ -67,7 +67,7 @@ class Interface(object):
 					  format(livingspace))
 
 	# function to add a fellow
-	def add_fellow(self, person_name, person_type, wants_accommodation):
+	def add_fellow(self, person_name, wants_accommodation):
 
 		add_error = 0
 		error = "Use a-z only for the person name, type and wants accomodation"
@@ -79,16 +79,14 @@ class Interface(object):
 			print(person_type, person_name, "Already exists!")
 			add_error = 1
 
-		if(not person_name.replace(' ', '').isalpha() or not person_type.
-				isalpha() or not wants_accommodation.isalpha()):
+		if(not person_name.replace(' ', '').isalpha() or not wants_accommodation.isalpha()):
 			add_error = 1
 			print(error)
 			return error
 
 		if(add_error == 0):
 
-			fellow_instance = Fellow(person_name, person_type,
-													   wants_accommodation)
+			fellow_instance = Fellow(person_name, wants_accommodation)
 			self.all_persons.update({fellow_instance.id:
 				[fellow_instance.person_name, fellow_instance.person_type, fellow_instance.wants_accommodation]})
 			print(fellow_instance.person_type, fellow_instance.person_name,
@@ -113,7 +111,7 @@ class Interface(object):
 				print("No living spaces allocated")
 
 	# function to add a staff
-	def add_staff(self, person_name, person_type, wants_accommodation):
+	def add_staff(self, person_name, wants_accommodation='N'):
 
 		add_error = 0
 		error = "Use a-z only for the person name, type and wants accomodation"
@@ -122,15 +120,14 @@ class Interface(object):
 			print(person_type, person_name, "Already exists!")
 			add_error = 1
 
-		if(not person_name.replace(' ', '').isalpha() or not person_type.
-				isalpha() or not wants_accommodation.isalpha()):
+		if(not person_name.replace(' ', '').isalpha() or not wants_accommodation.isalpha()):
 			add_error = 1
 			print(error)
 			return error
 
 		if(add_error == 0):
 
-			staff_instance = Staff(person_name, person_type)
+			staff_instance = Staff(person_name)
 			self.all_persons.update({staff_instance.id:
 				[staff_instance.person_name, staff_instance.person_type, staff_instance.wants_accommodation]})
 			print(staff_instance.person_type, staff_instance.person_name, "has been successfully added.")
