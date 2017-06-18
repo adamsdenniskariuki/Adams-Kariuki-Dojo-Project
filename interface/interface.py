@@ -289,7 +289,7 @@ class Interface(object):
 					if(unallocated_object.room_type == 'Office'):
 						self.without_offices.update({unallocated_object.pid: unallocated_object.room_type})
 					else:
-						self.without_offices.update({unallocated_object.pid: unallocated_object.room_type})
+						self.without_living.update({unallocated_object.pid: unallocated_object.room_type})
 
 			if stored_allocations:
 				for room_object in stored_allocations:

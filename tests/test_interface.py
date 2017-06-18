@@ -36,14 +36,20 @@ class TestDojoClass(unittest.TestCase):
 	def test_add_fellow(self):
 		self.assertTrue(self.fellow)
 		
+		add_fellow_output = self.interface.add_fellow("David Fulani", "N")
+		self.assertIn("No living spaces allocated", add_fellow_output)
+
 		add_fellow_error = self.interface.add_fellow("D4rius M1k3", "7")
 		self.assertEqual(add_fellow_error, "Use a-z only for the person name, type and wants accomodation")
 
 	#test add staff
 	def test_add_staff(self):
 		self.assertTrue(self.staff)
+
+		add_staff_error = self.interface.add_staff("Drew King", "Y")
+		self.assertIn("Staff members are not allocated living quarters", add_staff_error)
 		
-		add_staff_error = self.interface.add_fellow("Y0le ms33")
+		add_staff_error = self.interface.add_staff("Y0le ms33")
 		self.assertEqual(add_staff_error, "Use a-z only for the person name, type and wants accomodation")
 
 	#test create file with errors
