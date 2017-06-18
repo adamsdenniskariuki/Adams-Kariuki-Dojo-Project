@@ -43,12 +43,12 @@ class Dojo (cmd.Cmd):
 
 		if(arg['<room_type>'] == "Office" or
 				arg['<room_type>'] == "office"):
-			self.interface.create_office(arg['<room_name>'], arg[
-				'<room_type>'])
+			print(self.interface.create_office(arg['<room_name>'], arg[
+				'<room_type>']))
 		elif(arg['<room_type>'] == "Livingspace" or arg[
 				'<room_type>'] == "livingspace"):
-			self.interface.create_livingspace(arg['<room_name>'],
-										 arg['<room_type>'])
+			print(self.interface.create_livingspace(arg['<room_name>'],
+										 arg['<room_type>']))
 		else:
 			print("Indicate the office type: Office or Livingspace")
 
@@ -65,16 +65,16 @@ class Dojo (cmd.Cmd):
 			arg['<wants_accommodation>'] = "N"
 
 		if(arg['fellow']):
-			self.interface.add_fellow(
+			print(self.interface.add_fellow(
 				" ".join(
 					arg['<person_name>']),
-				arg['<wants_accommodation>'])
+				arg['<wants_accommodation>']))
 
 		if(arg['staff']):
-			self.interface.add_staff(
+			print(self.interface.add_staff(
 				" ".join(
 					arg['<person_name>']),
-				arg['<wants_accommodation>'])
+				arg['<wants_accommodation>']))
 
 	# function to show specific room allocation
 	@get_docopt_inputs
@@ -84,7 +84,7 @@ class Dojo (cmd.Cmd):
 			print_room <room_name>
 		"""
 
-		self.interface.print_room(arg['<room_name>'])
+		print(self.interface.print_room(arg['<room_name>']))
 
 	# function to show room allocations
 	@get_docopt_inputs
@@ -95,9 +95,9 @@ class Dojo (cmd.Cmd):
 		"""
 
 		if(arg['FILE'] and arg['-o']):
-			self.interface.print_allocations(arg['FILE'])
+			print(self.interface.print_allocations(arg['FILE']))
 		else:
-			self.interface.print_allocations()
+			print(self.interface.print_allocations())
 
 	# function display unallocated persons
 	@get_docopt_inputs
@@ -108,9 +108,9 @@ class Dojo (cmd.Cmd):
 		"""
 
 		if(arg['FILE'] and arg['-o']):
-			self.interface.print_unallocated(arg['FILE'])
+			print(self.interface.print_unallocated(arg['FILE']))
 		else:
-			self.interface.print_unallocated()
+			print(self.interface.print_unallocated())
 
 	# function to take variables to reallocate persons
 	@get_docopt_inputs
@@ -121,8 +121,8 @@ class Dojo (cmd.Cmd):
 				<new_room_name>
 		"""
 
-		self.interface.reallocate_person(arg[
-				'<person_identifier>'], arg['<new_room_name>'])
+		print(self.interface.reallocate_person(arg[
+				'<person_identifier>'], arg['<new_room_name>']))
 
 	# function to take variables to reallocate persons
 	@get_docopt_inputs
@@ -132,7 +132,7 @@ class Dojo (cmd.Cmd):
 			load_people
 		"""
 
-		self.interface.load_people()
+		print(self.interface.load_people())
 
 	# function to save state to db
 	@get_docopt_inputs
@@ -145,7 +145,7 @@ class Dojo (cmd.Cmd):
 		if not arg['DBNAME']:
 			arg['DBNAME'] = "dojo"
 
-		self.interface.save_state_orm(arg['DBNAME'])
+		print(self.interface.save_state_orm(arg['DBNAME']))
 
 	# function to load state from db
 	@get_docopt_inputs
@@ -158,7 +158,7 @@ class Dojo (cmd.Cmd):
 		if not arg['<dojodb>']:
 			arg['<dojodb>'] = "dojo"
 
-		self.interface.load_state_orm(arg['<dojodb>'])
+		print(self.interface.load_state_orm(arg['<dojodb>']))
 
 	# function to exit when 'exit' is typed
 	def do_exit(self, arg):

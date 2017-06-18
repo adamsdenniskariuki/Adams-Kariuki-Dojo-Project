@@ -7,7 +7,7 @@ class Person(metaclass=ABCMeta):
         self.person_name = person_name
         self.person_type = person_type
         self.wants_accommodation = wants_accommodation
-        self.id = id(person_name)
+        self.id = id(self.person_name)
 
     @abstractmethod
     def __repr__(self):
@@ -22,6 +22,7 @@ class Staff(Person):
 
     def __repr__(self):
         return "{}".format(self.person_name)
+
 
 #class to create a fellow
 class Fellow(Person):

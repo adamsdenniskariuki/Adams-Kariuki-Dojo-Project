@@ -39,7 +39,8 @@ class Allocations(Base):
 
 class Unallocated(Base):
 	__tablename__ = 'unallocated'
-	pid = Column(Integer, primary_key=True)
+	id = Column(Integer, primary_key=True)
+	pid = Column(Integer, nullable=False)
 	room_type = Column(String(250), nullable=False)
 
 	def __init__(self, pid, room_type):
