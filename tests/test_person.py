@@ -10,11 +10,11 @@ class TestStaffClass(unittest.TestCase):
 
 	#test instance of staff
 	def test_add_staff_instance(self):
-		self.assertTrue(self.staff.person_type, "Staff")
+		self.assertTrue(self.staff.wants_accommodation, 'N')
 
 	#test instance of fellow
 	def test_add_fellow_instance(self):
-		self.assertTrue(self.fellow, "Fellow")
+		self.assertTrue(self.fellow.wants_accommodation, 'Y')
 
 
 if __name__ == '__main__':

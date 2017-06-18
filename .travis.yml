@@ -1,11 +1,13 @@
 language: python
 python:
   - "3.4"
+  - "3.5"
+  - "3.6"
 install:
   - "pip install -r requirements.txt"
   - "pip install coveralls"
 # command to run tests
 script: 
-  coverage run --source=model -m py.test
+  coverage run --source=model,controller,interface -m py.test
 after_success:
   coveralls

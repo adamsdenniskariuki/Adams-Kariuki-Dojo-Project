@@ -52,7 +52,7 @@ class Interface(object):
 			if(not room.isalpha()):
 				output.append("Use a-z only for the room name and room type")
 				rooms.remove(room)
-		
+
 		if(len(rooms) > 0):
 			livingspace_instance = LivingSpace(rooms, room_type)
 			for livingspace in livingspace_instance.room_name:
@@ -74,11 +74,10 @@ class Interface(object):
 			fellow_instance = Fellow(person_name, wants_accommodation)
 			self.all_persons.update({fellow_instance.id:
 				[fellow_instance.person_name, fellow_instance.person_type, fellow_instance.wants_accommodation]})
-			print(fellow_instance.id)
 			output.append(' '.join([fellow_instance.person_type, fellow_instance.person_name,
 				"has been successfully added,"]))
 
-			if(self.allocate_office(fellow_instance.id) == 1):
+			if(self.__allocate_office(fellow_instance.id) == 1):
 				officeallocation = self.office_allocation[fellow_instance.id]
 				output.append(' '.join([fellow_instance.person_type, fellow_instance.person_name,
 					"has been allocated", officeallocation, self.all_rooms[officeallocation]]))
@@ -87,7 +86,7 @@ class Interface(object):
 				output.append("No offices available for allocation")
 
 			if(wants_accommodation.lower() == 'y'):
-				if(self.allocate_livingspace(fellow_instance.id) == 1):
+				if(self.__allocate_livingspace(fellow_instance.id) == 1):
 					livingallocation = self.living_allocation[fellow_instance.id]
 					output.append(' '.join([fellow_instance.person_type, fellow_instance.person_name,
 						"has been allocated", livingallocation, self.all_rooms[livingallocation]]))
@@ -111,14 +110,13 @@ class Interface(object):
 			staff_instance = Staff(person_name)
 			self.all_persons.update({staff_instance.id:
 				[staff_instance.person_name, staff_instance.person_type, staff_instance.wants_accommodation]})
-			print(staff_instance.id)
 			output.append(' '.join([staff_instance.person_type, staff_instance.person_name,
 				"has been successfully added."]))
 
 			if(wants_accommodation.lower() == "y"):
 				output.append("Staff members are not allocated living quarters")
 
-			if(self.allocate_office(staff_instance.id) == 1):
+			if(self.__allocate_office(staff_instance.id) == 1):
 				allocation = self.office_allocation[staff_instance.id]
 				output.append(' '.join([staff_instance.person_type, staff_instance.person_name,
 					"has been allocated", allocation, self.all_rooms[allocation]]))
@@ -140,47 +138,49 @@ class Interface(object):
 			
 			if(os.path.exists(filename)):
 				output.append("The file already exists. Choose another file name.")
-			file_handler = open(filename, "w")
+
+			if(len(output) == 0):
+
+				file_handler = open(filename, "w")
 			
-			if(isinstance(data, list)):
-				for key in data:
-					file_handler.write(' '.join([key, '\n']))
-			else:
-				if(self.living_allocation):
-					allocated = self.living_allocation.values()
-					allocated = list(set(allocated))
-					for allocation in allocated:
-						file_handler.write(' '.join(
-							[allocation, self.all_rooms[allocation]]))
-						file_handler.write(
-							'\n=======================================\n')
-						file_handler.write(','.join(
-							[self.all_persons[pid][0] for pid, room in
-								self.living_allocation.items()
-								if room == allocation]))
-						file_handler.write('\n\n')
-				
-				if(self.office_allocation):
-					allocated = self.office_allocation.values()
-					allocated = list(set(allocated))
-					for allocation in allocated:
-						file_handler.write(' '.join(
-							[allocation, self.all_rooms[allocation]]))
-						file_handler.write(
-							'\n=======================================\n')
-						file_handler.write(','.join(
-							[self.all_persons[pid][0] for pid, room in
-								self.office_allocation.items()
-								if room == allocation]))
-						file_handler.write('\n\n')
-			
-			file_handler.close()
-			output.append("File {} created".format(filename))
+				if(isinstance(data, list)):
+					for key in data:
+						file_handler.write(' '.join([key, '\n']))
+				else:
+					if(self.living_allocation):
+						allocated = self.living_allocation.values()
+						allocated = list(set(allocated))
+						for allocation in allocated:
+							file_handler.write(' '.join(
+								[allocation, self.all_rooms[allocation]]))
+							file_handler.write(
+								'\n=======================================\n')
+							file_handler.write(','.join(
+								[self.all_persons[pid][0] for pid, room in
+									self.living_allocation.items()
+									if room == allocation]))
+							file_handler.write('\n\n')
+					
+					if(self.office_allocation):
+						allocated = self.office_allocation.values()
+						allocated = list(set(allocated))
+						for allocation in allocated:
+							file_handler.write(' '.join(
+								[allocation, self.all_rooms[allocation]]))
+							file_handler.write(
+								'\n=======================================\n')
+							file_handler.write(','.join(
+								[self.all_persons[pid][0] for pid, room in
+									self.office_allocation.items()
+									if room == allocation]))
+							file_handler.write('\n\n')
+					file_handler.close()
+					output.append("File {} created".format(filename))
 
 		return '\n'.join(output)
 
 	# function to allocate a room to a person
-	def allocate_office(self, person_id):
+	def __allocate_office(self, person_id):
 
 		rooms = [room_name for room_name, room_type in list(self.all_rooms.items()) if(room_type=="Office")]
 		shuffle(rooms)
@@ -193,7 +193,7 @@ class Interface(object):
 		return 0
 
 	# function to allocate a livingspace to a person
-	def allocate_livingspace(self, person_id):
+	def __allocate_livingspace(self, person_id):
 
 		rooms = [room_name for room_name, room_type in list(self.all_rooms.items()) if(room_type=="LivingSpace")]
 		shuffle(rooms)
@@ -206,7 +206,7 @@ class Interface(object):
 		return 0
 
 	#function to create the db
-	def create_db(self, db_name):
+	def __create_db(self, db_name):
 
 		engine = create_engine('sqlite:///{}'.format(db_name))
 		#engine = create_engine('postgres://postgres:healthcheck17@localhost/dojo')
@@ -221,7 +221,7 @@ class Interface(object):
 		if(not db_name.isalpha()):
 			output.append("Use a-z for the database name")
 		else:
-			session = self.create_db(''.join(["db/", db_name, ".db"]))
+			session = self.__create_db(''.join(["db/", db_name, ".db"]))
 
 			if(self.all_persons):
 				for key, val in self.all_persons.items():
@@ -269,7 +269,7 @@ class Interface(object):
 		if(os.path.exists(''.join(["db/", db_name, ".db"])) is False):
 			output.append("database {} does not exist.".format(db_name))
 		else:
-			session = self.create_db(''.join(["db/", db_name, ".db"]))
+			session = self.__create_db(''.join(["db/", db_name, ".db"]))
 			stored_persons = session.query(Persons).all()
 			stored_rooms = session.query(Rooms).all()
 			stored_allocations = session.query(Allocations).all()
@@ -291,7 +291,6 @@ class Interface(object):
 					else:
 						self.without_offices.update({unallocated_object.pid: unallocated_object.room_type})
 
-
 			if stored_allocations:
 				for room_object in stored_allocations:
 					if(room_object.room_type == 'Office'):
@@ -306,6 +305,7 @@ class Interface(object):
 	def reallocate_person(self, person_identifier, new_room_name):
 
 		output = []
+		print(person_identifier)
 		pid_list = [pid if ' '.join(person_identifier) in data else 0
 			for pid, data in list(self.all_persons.items()) if ' '.join(person_identifier) in data]
 

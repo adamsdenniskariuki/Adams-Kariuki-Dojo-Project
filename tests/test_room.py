@@ -5,16 +5,8 @@ from model.room import Office, LivingSpace
 class TestRoomClass(unittest.TestCase):
 
 	def setUp(self):
-		self.office = Office(["Yellow"], "Office")
-		self.livingspace = LivingSpace(["White"], "LivingSpace")
-
-	#test instance of office
-	def test_create_office_instance(self):
-		self.assertTrue(self.office.room_type, "Office")
-
-	#test instance of living room
-	def test_create_livingspace_instance(self):
-		self.assertTrue(self.livingspace.room_type, "LivingSpace")
+		self.office = Office(["Pink"], "Office")
+		self.livingspace = LivingSpace(["Black"], "LivingSpace")
 
 	#test office max occupants
 	def test_office_max_occupants(self):
