@@ -28,7 +28,8 @@ class Persons(Base):
 
 class Allocations(Base):
 	__tablename__ = 'allocation'
-	pid = Column(Integer, primary_key=True)
+	allocation_id = Column(Integer, primary_key=True)
+	pid = Column(Integer, nullable=False)
 	room_name = Column(String(250), nullable=False)
 	room_type = Column(String(250), nullable=False)
 
@@ -39,7 +40,7 @@ class Allocations(Base):
 
 class Unallocated(Base):
 	__tablename__ = 'unallocated'
-	id = Column(Integer, primary_key=True)
+	unallocated_id = Column(Integer, primary_key=True)
 	pid = Column(Integer, nullable=False)
 	room_type = Column(String(250), nullable=False)
 

@@ -40,9 +40,7 @@ class Interface(object):
 
 	# function to create a living space
 	def create_livingspace(self, rooms, room_type):
-
 		output = []
-			
 		for room in rooms:
 			
 			if(room in self.all_rooms):
@@ -63,9 +61,7 @@ class Interface(object):
 
 	# function to add a fellow
 	def add_fellow(self, person_name, wants_accommodation='N'):
-
 		output = []
-
 		if(not person_name.replace(' ', '').isalpha() or not wants_accommodation.isalpha()):
 			output.append("Use a-z only for the person name, type and wants accomodation")
 
@@ -91,6 +87,7 @@ class Interface(object):
 					output.append(' '.join([fellow_instance.person_type, fellow_instance.person_name,
 						"has been allocated", livingallocation, self.all_rooms[livingallocation]]))
 				else:
+					output.append("No Living Spaces available for allocation")
 					self.without_living.update({fellow_instance.id:"LivingSpace"})
 			else:
 				output.append("No living spaces allocated")
@@ -99,9 +96,7 @@ class Interface(object):
 
 	# function to add a staff
 	def add_staff(self, person_name, wants_accommodation='N'):
-
 		output = []
-
 		if(not person_name.replace(' ', '').isalpha() or not wants_accommodation.isalpha()):
 			output.append("Use a-z only for the person name, type and wants accomodation")
 
@@ -128,9 +123,7 @@ class Interface(object):
 
 	# function to create a file
 	def create_file(self, filename, data):
-
 		output = []
-
 		if(not filename.isalpha()):
 			output.append("Use a-z only for the file name")
 		else:
@@ -146,6 +139,7 @@ class Interface(object):
 				if(isinstance(data, list)):
 					for key in data:
 						file_handler.write(' '.join([key, '\n']))
+					output.append("File {} created".format(filename))
 				else:
 					if(self.living_allocation):
 						allocated = self.living_allocation.values()
@@ -305,18 +299,17 @@ class Interface(object):
 	def reallocate_person(self, person_identifier, new_room_name):
 
 		output = []
-		print(person_identifier)
 		pid_list = [pid if ' '.join(person_identifier) in data else 0
 			for pid, data in list(self.all_persons.items()) if ' '.join(person_identifier) in data]
 
 		if(self.all_persons and pid_list):
 			pid = pid_list[0]
 		else:
-			output.append("Person {} does not exist".format(' '.join(person_identifier)))
+			output.append("Person {} does not have any allocations or does not exist".format(' '.join(person_identifier)))
 		
 		if(self.all_rooms):
 			if(new_room_name not in self.all_rooms):
-				output.append("Room {} does not exist".format(new_room_name))
+				output.append("Room {} has not been allocated or does not exist".format(new_room_name))
 		else:
 			output.append("No rooms created")
 		
@@ -387,12 +380,16 @@ class Interface(object):
 			if(len(self.office_allocation) != 0):
 				for key, value in self.office_allocation.items():
 					if value == room_name:
-						output.append(' '.join([self.all_persons[key][0], 'office', value]))
+						output.append(' '.join([self.all_persons[key][0], self.all_persons[key][1], value, 'Office']))
+			else:
+				output.append("No offices allocated")
 
 			if(len(self.living_allocation) != 0):
 				for key, value in self.living_allocation.items():
 					if value == room_name:
-						output.append(' '.join([self.all_persons[key][0], 'living space', value]))
+						output.append(' '.join([self.all_persons[key][0], self.all_persons[key][1], value, 'Living Space']))
+			else:
+				output.append("No living spaces allocated")
 		return '\n'.join(output)
 
 	#function to load persons from a text file

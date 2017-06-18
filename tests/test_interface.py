@@ -82,10 +82,10 @@ class TestDojoClass(unittest.TestCase):
 	#test reallocate person to another room
 	def test_reallocate_person(self):
 		reallocate_person_output = self.interface.reallocate_person(['Sam', 'Kim'], "blue")
-		self.assertEqual(reallocate_person_output, "Person Sam Kim does not exist")
+		self.assertEqual(reallocate_person_output, "Person Sam Kim does not have any allocations or does not exist")
 		
 		reallocate_person_output = self.interface.reallocate_person(['Adams', 'Kitui'], "purple")
-		self.assertEqual(reallocate_person_output, "Room purple does not exist")
+		self.assertEqual(reallocate_person_output, "Room purple has not been allocated or does not exist")
 		
 		self.assertTrue(self.interface.create_office(["red"], "Office"))
 		reallocate_person_output = self.interface.reallocate_person(['John', 'Kamau'], "red")
