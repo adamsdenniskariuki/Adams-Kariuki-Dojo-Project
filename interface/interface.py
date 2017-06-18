@@ -19,7 +19,6 @@ class Interface(object):
 
 	# function create an office
 	def create_office(self, rooms, room_type):
-		
 		output = []
 		for room in rooms:
 			
@@ -52,8 +51,8 @@ class Interface(object):
 			
 			if(not room.isalpha()):
 				output.append("Use a-z only for the room name and room type")
-				rooms.remove(room)		
-
+				rooms.remove(room)
+		
 		if(len(rooms) > 0):
 			livingspace_instance = LivingSpace(rooms, room_type)
 			for livingspace in livingspace_instance.room_name:
@@ -383,7 +382,7 @@ class Interface(object):
 
 		output = []
 		if(room_name not in self.all_rooms):
-			output.append(' '.join(["Room", room_name, "does not exist.".format(room_name)]))
+			output.append("Room {} does not exist.".format(room_name))
 		else:
 			if(len(self.office_allocation) != 0):
 				for key, value in self.office_allocation.items():
