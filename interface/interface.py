@@ -21,7 +21,6 @@ class Interface(object):
 	def create_office(self, rooms, room_type):
 		output = []
 		for room in rooms:
-			
 			if(room in self.all_rooms):
 				output.append("Room {} already exists!".format(room))
 				rooms.remove(room)

@@ -107,12 +107,12 @@ class TestDojoClass(unittest.TestCase):
 		self.interface.print_unallocated("allocationstest")
 		self.assertEqual(os.path.exists("./files/allocationstest.txt"), True)
 
-	#test print a non existent room 
+	#test print a non existent room
 	def test_print_room_with_errors(self):
 		print_room_output = self.interface.print_room("myroom")
 		self.assertEqual(print_room_output, "Room myroom does not exist.")
 
-	#test print a room 
+	#test print a room
 	def test_print_room(self):
 		print_room = self.interface.print_room("blue")
 		self.assertIn("John Kamau", print_room)
